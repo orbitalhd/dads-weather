@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <title>The Real Personal WS</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0c1220">
+    <meta name="description" content="Real-time weather from personal weather stations">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --bg: #0c1220; --white: #ffffff; --gray: rgba(255,255,255,0.7); --muted: rgba(255,255,255,0.45); --blue: #38bdf8; --green: #4ade80; --orange: #fb923c; --gold: #fbbf24; }
+        html, body { height: 100%; overflow-x: hidden; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--white); min-height: 100%; padding: 16px; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: max(100px, calc(env(safe-area-inset-bottom) + 90px)); }
+        body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+        .app { position: relative; z-index: 1; max-width: 500px; margin: 0 auto; }
+
+        /* Header */
+        .header { text-align: center; margin-bottom: 20px; }
+        .date-display { margin-bottom: 12px; }
+        .day-name { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 6px; color: var(--gray); margin-bottom: 2px; }
+        .full-date { font-size: 13px; color: var(--muted); letter-spacing: 1px; }
+        .header h1 { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 500; margin-bottom: 8px; line-height: 1.2; }
+        .the-real { display: block; font-size: 14px; font-family: 'Inter', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 4px; color: var(--blue); opacity: 0; transform: translateY(-20px); animation: dropIn 0.6s ease-out 0.3s forwards; }
+        @keyframes dropIn { 0% { opacity: 0; transform: translateY(-20px); } 60% { opacity: 1; transform: translateY(4px); } 100% { opacity: 1; transform: translateY(0); } }
+        .main-title { display: block; background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.85) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .status { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); background: rgba(255,255,255,0.06); padding: 6px 14px; border-radius: 20px; }
+        .live-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s ease-in-out infinite; box-shadow: 0 0 12px var(--green); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* Sun Tracker */
+        .sun-card { background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 20px; margin-bottom: 16px; }
+        .sun-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .sun-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); }
+        .golden-badge { font-size: 10px; font-weight: 700; padding: 6px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .golden-badge.active { background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(251, 146, 60, 0.3)); color: var(--gold); border: 1px solid var(--gold); animation: goldenGlow 1.5s ease-in-out infinite; }
+        .golden-badge.soon { background: rgba(251, 191, 36, 0.15); color: var(--gold); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .golden-badge.inactive { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid rgba(255,255,255,0.1); }
+        @keyframes goldenGlow { 0%, 100% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); } 50% { box-shadow: 0 0 25px rgba(251, 191, 36, 0.7); } }
+
+        .sun-arc-container { position: relative; height: 90px; margin-bottom: 12px; }
+        .sun-arc { position: absolute; bottom: 0; left: 10%; width: 80%; height: 70px; border: 2px dashed rgba(255,255,255,0.12); border-bottom: none; border-radius: 200px 200px 0 0; }
+        .sun-position { position: absolute; width: 28px; height: 28px; background: radial-gradient(circle, var(--gold) 0%, var(--orange) 100%); border-radius: 50%; box-shadow: 0 0 20px var(--gold), 0 0 40px rgba(251, 191, 36, 0.4); transform: translate(-50%, 50%); transition: all 0.3s ease; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+        .horizon { position: absolute; bottom: 0; left: 5%; width: 90%; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); }
+        .sun-label { position: absolute; bottom: -18px; font-size: 10px; color: var(--muted); }
+        .sun-label.rise { left: 10%; }
+        .sun-label.set { right: 10%; }
+
+        .sun-stats { display: flex; justify-content: space-between; gap: 8px; margin-top: 20px; }
+        .sun-stat { flex: 1; text-align: center; padding: 10px 6px; background: rgba(0,0,0,0.2); border-radius: 12px; }
+        .sun-stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 4px; }
+        .sun-stat-value { font-size: 14px; font-weight: 600; }
+        .sun-stat-value.gold { color: var(--gold); }
+
+        /* Station Card */
+        .station { position: relative; border-radius: 28px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.4); }
+        .station-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: cover; background-position: center; }
+        .station-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.75) 100%); }
+        .station-content { position: relative; z-index: 2; padding: 24px; }
+        .station-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .station-name { font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .station-location { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+        .badge { font-size: 10px; font-weight: 600; padding: 5px 12px; border-radius: 14px; text-transform: uppercase; backdrop-filter: blur(10px); }
+        .badge.live { background: rgba(74, 222, 128, 0.25); color: #86efac; border: 1px solid rgba(74, 222, 128, 0.3); }
+        .badge.offline { background: rgba(251, 146, 60, 0.25); color: #fdba74; border: 1px solid rgba(251, 146, 60, 0.3); }
+        .condition-tag { display: inline-block; font-size: 13px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 6px 14px; border-radius: 20px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); }
+
+        /* Comfort Score */
+        .comfort-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding: 16px; background: rgba(0,0,0,0.25); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .comfort-ring-wrap { position: relative; width: 68px; height: 68px; flex-shrink: 0; }
+        .comfort-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .comfort-ring-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 5; }
+        .comfort-ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+        .comfort-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 700; }
+        .comfort-info { flex: 1; }
+        .comfort-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 2px; }
+        .comfort-status { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+        .comfort-desc { font-size: 12px; color: var(--gray); }
+
+        /* Wind Compass */
+        .wind-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .compass { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+        .compass-circle { position: absolute; inset: 0; border: 2px solid rgba(255,255,255,0.15); border-radius: 50%; }
+        .compass-dirs { position: absolute; inset: 4px; font-size: 9px; font-weight: 600; color: var(--muted); }
+        .compass-dirs span { position: absolute; }
+        .compass-dirs .n { top: 0; left: 50%; transform: translateX(-50%); color: var(--white); }
+        .compass-dirs .s { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .compass-dirs .e { right: 0; top: 50%; transform: translateY(-50%); }
+        .compass-dirs .w { left: 0; top: 50%; transform: translateY(-50%); }
+        .compass-needle { position: absolute; top: 50%; left: 50%; width: 4px; height: 30px; transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); transition: transform 0.4s ease; }
+        .compass-needle::before { content: ''; position: absolute; top: 0; left: -4px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 18px solid var(--blue); filter: drop-shadow(0 0 6px var(--blue)); }
+        .compass-needle::after { content: ''; position: absolute; bottom: -8px; left: -3px; width: 10px; height: 10px; background: var(--white); border-radius: 50%; }
+        .wind-info { flex: 1; }
+        .wind-speed { font-size: 28px; font-weight: 700; line-height: 1; }
+        .wind-speed .unit { font-size: 14px; font-weight: 400; color: var(--gray); }
+        .wind-dir { font-size: 13px; color: var(--gray); margin-top: 4px; }
+        .wind-gust { font-size: 11px; color: var(--orange); margin-top: 4px; }
+
+        /* Temp */
+        .temp-section { text-align: center; margin-bottom: 20px; }
+        .temp-row { display: flex; align-items: flex-start; justify-content: center; }
+        .temp-big { font-family: 'Fraunces', serif; font-size: 100px; font-weight: 400; line-height: 1; text-shadow: 0 4px 30px rgba(0,0,0,0.3); }
+        .temp-deg { font-size: 32px; color: rgba(255,255,255,0.7); margin-top: 14px; }
+        .feels { font-size: 14px; color: var(--gray); margin-top: 4px; }
+        .feels strong { color: var(--white); }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .cell { background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px 8px; text-align: center; }
+        .cell-icon { font-size: 18px; margin-bottom: 4px; }
+        .cell-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.5); margin-bottom: 3px; }
+        .cell-value { font-size: 16px; font-weight: 600; }
+        .cell-value .unit { font-size: 10px; font-weight: 400; color: rgba(255,255,255,0.6); }
+
+        /* Summary */
+        .summary-btn { width: 100%; margin-top: 16px; padding: 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; color: var(--white); font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .summary-btn:active { transform: scale(0.98); }
+        .summary-btn svg { transition: transform 0.3s; }
+        .summary-btn.open svg { transform: rotate(180deg); }
+        .summary-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .summary-content.open { max-height: 600px; padding-top: 14px; }
+        .forecast-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+        .forecast-period { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--blue); margin-bottom: 6px; }
+        .forecast-text { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.8); }
+
+        /* Bottom */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; padding-bottom: max(20px, env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg) 50%, transparent); display: flex; justify-content: center; align-items: center; gap: 20px; z-index: 100; }
+        .countdown { font-size: 13px; color: var(--muted); min-width: 70px; text-align: center; }
+        .btn-refresh { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--blue) 0%, #0ea5e9 100%); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4); }
+        .btn-refresh:active { transform: scale(0.9); }
+        .btn-refresh.spinning svg { animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading { text-align: center; padding: 60px 20px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--blue); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 12px; }
+        .error { background: rgba(251, 146, 60, 0.15); border: 1px solid rgba(251, 146, 60, 0.2); border-radius: 16px; padding: 20px; text-align: center; }
+        .update-time { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="date-display">
+                <div class="day-name" id="dayName"></div>
+                <div class="full-date" id="fullDate"></div>
+            </div>
+            <h1>
+                <span class="the-real">The Real</span>
+                <span class="main-title">☀️ Personal WS</span>
+            </h1>
+            <div class="status">
+                <span class="live-dot"></span>
+                <span id="lastUpdate">Loading...</span>
+            </div>
+        </header>
+
+        <p class="update-time" id="stationTime"></p>
+
+        <main id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                <div>Getting weather data...</div>
+            </div>
+        </main>
+
+        <!-- Sun Tracker (for drone pilots 🚁) -->
+        <div class="sun-card" id="sunCard">
+            <div class="sun-header">
+                <span class="sun-title">🚁 Golden Hour Tracker</span>
+                <span class="golden-badge inactive" id="goldenBadge">Golden Hour</span>
+            </div>
+            <div class="sun-arc-container">
+                <div class="sun-arc"></div>
+                <div class="sun-position" id="sunPos">☀️</div>
+                <div class="horizon"></div>
+                <span class="sun-label rise" id="riseLabel">--:--</span>
+                <span class="sun-label set" id="setLabel">--:--</span>
+            </div>
+            <div class="sun-stats">
+                <div class="sun-stat">
+                    <div class="sun-stat-label">Daylight Left</div>
+                    <div class="sun-stat-value" id="daylightLeft">--</div>
+                </div>
+                <div class="sun-stat">
+                    <div class="sun-stat-label">Golden Hour</div>
+                    <div class="sun-stat-value gold" id="goldenTime">--</div>
+                </div>
+                <div class="sun-stat">
+                    <div class="sun-stat-label">Status</div>
+                    <div class="sun-stat-value" id="sunStatus">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <span class="countdown" id="countdown">60s</span>
+        <button class="btn-refresh" onclick="refresh()" id="refreshBtn">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+            </svg>
+        </button>
+        <span class="countdown"></span>
+    </div>
+
+    <script>
+        const API_KEY = 'c3fd2f9b93a64c1abd2f9b93a6ec1a87';
+        const STATIONS = [
+            { id: 'KTNFRANK375', name: 'Battlefield Park', location: 'Intersection of Columbia Ave. -|- Battle Ave.' },
+            { id: 'KTNFRANK244', name: 'Heath Place', location: 'Directly off Carnton Lane' }
+        ];
+
+        const BACKGROUNDS = {
+            clearDay: ['https://images.unsplash.com/photo-1601297183305-6df142704ea2?w=800&q=80'],
+            clearNight: ['https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=800&q=80'],
+            cloudy: ['https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=800&q=80'],
+            partlyCloudy: ['https://images.unsplash.com/photo-1517483000871-1dbf64a6e1c6?w=800&q=80'],
+            rain: ['https://images.unsplash.com/photo-1519692933481-e162a57d6721?w=800&q=80'],
+            storm: ['https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?w=800&q=80'],
+            snow: ['https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=800&q=80'],
+            fog: ['https://images.unsplash.com/photo-1485236715568-ddc5ee6ca227?w=800&q=80'],
+            cold: ['https://images.unsplash.com/photo-1483664852095-d6cc6870702d?w=800&q=80'],
+            hot: ['https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=800&q=80'],
+            windy: ['https://images.unsplash.com/photo-1527482937786-6f098c8c3687?w=800&q=80']
+        };
+
+        let countdown = 60, timer, sunData = null;
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('dayName').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase().split('').join(' ');
+            document.getElementById('fullDate').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+            if (sunData) updateSunTracker();
+        }
+
+        function updateSunTracker() {
+            const now = new Date();
+            const sunrise = new Date(sunData.sunrise);
+            const sunset = new Date(sunData.sunset);
+            const goldenStart = new Date(sunset.getTime() - 60 * 60 * 1000);
+
+            document.getElementById('riseLabel').textContent = sunrise.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            document.getElementById('setLabel').textContent = sunset.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            document.getElementById('goldenTime').textContent = goldenStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+            const total = sunset - sunrise;
+            const elapsed = now - sunrise;
+            let progress = Math.max(0, Math.min(1, elapsed / total));
+
+            // Position sun on arc
+            const angle = Math.PI * progress;
+            const x = 50 - Math.cos(angle) * 40;
+            const y = 70 - Math.sin(angle) * 65;
+            const sunPos = document.getElementById('sunPos');
+            sunPos.style.left = `${x}%`;
+            sunPos.style.bottom = `${y}px`;
+
+            // Daylight remaining
+            const remaining = sunset - now;
+            const badge = document.getElementById('goldenBadge');
+            const status = document.getElementById('sunStatus');
+
+            if (now < sunrise) {
+                document.getElementById('daylightLeft').textContent = 'Before dawn';
+                status.textContent = '🌙 Night';
+                sunPos.textContent = '🌙';
+                badge.className = 'golden-badge inactive';
+                badge.textContent = 'Golden Hour';
+            } else if (now > sunset) {
+                document.getElementById('daylightLeft').textContent = 'After dusk';
+                status.textContent = '🌙 Night';
+                sunPos.textContent = '🌙';
+                badge.className = 'golden-badge inactive';
+                badge.textContent = 'Golden Hour';
+            } else {
+                const h = Math.floor(remaining / 3600000);
+                const m = Math.floor((remaining % 3600000) / 60000);
+                document.getElementById('daylightLeft').textContent = `${h}h ${m}m`;
+                sunPos.textContent = '☀️';
+
+                if (now >= goldenStart) {
+                    const left = Math.floor((sunset - now) / 60000);
+                    status.textContent = '🌅 GO FLY!';
+                    badge.className = 'golden-badge active';
+                    badge.textContent = `📸 ${left}m LEFT!`;
+                } else {
+                    const until = Math.floor((goldenStart - now) / 60000);
+                    if (until <= 90) {
+                        const uh = Math.floor(until / 60);
+                        const um = until % 60;
+                        status.textContent = uh > 0 ? `In ${uh}h ${um}m` : `In ${um}m`;
+                        badge.className = 'golden-badge soon';
+                        badge.textContent = uh > 0 ? `In ${uh}h ${um}m` : `🔜 ${um}m`;
+                    } else {
+                        status.textContent = '☀️ Daytime';
+                        badge.className = 'golden-badge inactive';
+                        badge.textContent = 'Golden Hour';
+                    }
+                }
+            }
+        }
+
+        function getComfort(d) {
+            if (!d) return { score: 0, label: 'Unknown', desc: 'No data', color: '#666' };
+            
+            const temp = d.imperial?.temp;
+            const feelsLike = d.imperial?.windChill ?? d.imperial?.heatIndex ?? temp;
+            const dew = d.imperial?.dewpt ?? 50;
+            const wind = d.imperial?.windSpeed ?? 0;
+            const uv = d.uv ?? 0;
+            
+            if (temp === null || temp === undefined) {
+                return { score: 0, label: 'Unknown', desc: 'No data', color: '#666' };
+            }
+            
+            // Use feels-like for the real experience
+            const effective = feelsLike ?? temp;
+            
+            let score = 100;
+            let tempDesc = '';
+            
+            // TEMPERATURE - the main factor (be aggressive!)
+            // Ideal range: 65-75°F
+            if (effective <= 10) {
+                score -= 80;
+                tempDesc = 'Dangerously cold';
+            } else if (effective <= 20) {
+                score -= 70;
+                tempDesc = 'Bitter cold';
+            } else if (effective <= 32) {
+                score -= 60;
+                tempDesc = 'Freezing';
+            } else if (effective <= 40) {
+                score -= 50;
+                tempDesc = 'Very cold';
+            } else if (effective <= 50) {
+                score -= 38;
+                tempDesc = 'Cold';
+            } else if (effective <= 55) {
+                score -= 25;
+                tempDesc = 'Chilly';
+            } else if (effective <= 62) {
+                score -= 12;
+                tempDesc = 'Cool';
+            } else if (effective <= 78) {
+                // Sweet spot!
+                score += 5;
+                tempDesc = 'Perfect';
+            } else if (effective <= 85) {
+                score -= 15;
+                tempDesc = 'Warm';
+            } else if (effective <= 90) {
+                score -= 30;
+                tempDesc = 'Hot';
+            } else if (effective <= 95) {
+                score -= 50;
+                tempDesc = 'Very hot';
+            } else if (effective <= 100) {
+                score -= 65;
+                tempDesc = 'Dangerous heat';
+            } else {
+                score -= 80;
+                tempDesc = 'Extreme heat';
+            }
+            
+            // DEW POINT - humidity discomfort (mainly in warm weather)
+            if (effective > 65) {
+                if (dew > 70) {
+                    score -= 18;
+                    tempDesc += ', oppressive';
+                } else if (dew > 65) {
+                    score -= 12;
+                    tempDesc += ', muggy';
+                } else if (dew > 60) {
+                    score -= 6;
+                    tempDesc += ', humid';
+                }
+            }
+            
+            // WIND - worse when it's already cold
+            if (effective < 50) {
+                if (wind > 15) {
+                    score -= 12;
+                    tempDesc += ', biting wind';
+                } else if (wind > 8) {
+                    score -= 6;
+                    tempDesc += ', windy';
+                }
+            } else if (wind > 25) {
+                score -= 10;
+                tempDesc += ', very windy';
+            } else if (wind > 15) {
+                score -= 5;
+            }
+            
+            // UV - sun exposure risk
+            if (uv >= 8) {
+                score -= 10;
+            } else if (uv >= 6) {
+                score -= 5;
+            }
+            
+            score = Math.max(0, Math.min(100, Math.round(score)));
+            
+            // Generate realistic label and helpful description
+            let label, desc, color;
+            
+            if (score >= 80) {
+                label = 'Perfect';
+                desc = 'Great day to be outside!';
+                color = '#4ade80';
+            } else if (score >= 65) {
+                label = 'Nice';
+                desc = tempDesc || 'Enjoyable weather';
+                color = '#a3e635';
+            } else if (score >= 50) {
+                label = 'Okay';
+                desc = tempDesc || 'Manageable';
+                color = '#fbbf24';
+            } else if (score >= 35) {
+                label = 'Rough';
+                desc = tempDesc || 'Not great outside';
+                color = '#fb923c';
+            } else if (score >= 20) {
+                label = 'Poor';
+                desc = tempDesc || 'Stay inside if possible';
+                color = '#f87171';
+            } else {
+                label = 'Harsh';
+                desc = tempDesc || 'Dangerous conditions';
+                color = '#ef4444';
+            }
+            
+            // Add actionable advice based on temperature
+            if (effective <= 32) {
+                desc = tempDesc + ' — Heavy coat required!';
+            } else if (effective <= 45) {
+                desc = tempDesc + ' — Wear a warm coat';
+            } else if (effective <= 58) {
+                desc = tempDesc + ' — Bring a jacket';
+            } else if (effective >= 95) {
+                desc = tempDesc + ' — Stay inside, hydrate!';
+            } else if (effective >= 88) {
+                desc = tempDesc + ' — Limit time outside';
+            } else if (effective >= 80 && dew > 65) {
+                desc = tempDesc + ' — Stay cool, drink water';
+            }
+            
+            return { score, label, desc, color };
+        }
+
+        function getCondition(d) {
+            if (!d) return { type: 'cloudy', label: 'Unknown' };
+            const t = d.imperial?.temp, h = d.humidity || 0, w = d.imperial?.windSpeed || 0, p = d.imperial?.precipRate || 0, s = d.solarRadiation || 0, u = d.uv || 0;
+            const night = new Date().getHours() < 6 || new Date().getHours() > 20;
+            if (t < 35 && p > 0) return { type: 'snow', label: '❄️ Snow' };
+            if (p > 0.1) return { type: 'storm', label: '⛈️ Storm' };
+            if (p > 0) return { type: 'rain', label: '🌧️ Rain' };
+            if (h > 90 && t < 60) return { type: 'fog', label: '🌫️ Fog' };
+            if (t < 32) return { type: 'cold', label: '🥶 Freezing' };
+            if (t > 90) return { type: 'hot', label: '🔥 Hot' };
+            if (w > 20) return { type: 'windy', label: '💨 Windy' };
+            if (s > 400 || u > 3) return night ? { type: 'clearNight', label: '🌙 Clear' } : { type: 'clearDay', label: '☀️ Sunny' };
+            if (s > 150 || u > 1) return { type: 'partlyCloudy', label: '⛅ Partly Cloudy' };
+            return night ? { type: 'clearNight', label: '🌙 Clear' } : { type: 'cloudy', label: '☁️ Cloudy' };
+        }
+
+        async function fetchStation(id) {
+            const r = await fetch(`https://api.weather.com/v2/pws/observations/current?stationId=${id}&format=json&units=e&apiKey=${API_KEY}`);
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return (await r.json()).observations?.[0];
+        }
+
+        async function fetchForecast(lat, lon) {
+            const r = await fetch(`https://api.weather.com/v3/wx/forecast/daily/5day?geocode=${lat},${lon}&format=json&units=e&language=en-US&apiKey=${API_KEY}`);
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return await r.json();
+        }
+
+        function renderStation(cfg, d, fc) {
+            if (!d) return `<div class="station"><div class="station-bg" style="background:#1e293b"></div><div class="station-content"><div class="station-header"><div><div class="station-name">${cfg.name}</div><div class="station-location">${cfg.location}</div></div><span class="badge offline">Offline</span></div><div class="error"><p>No data</p></div></div></div>`;
+
+            const t = d.imperial?.temp ?? '--', fl = d.imperial?.windChill ?? d.imperial?.heatIndex ?? t;
+            const hum = d.humidity ?? '--', wind = d.imperial?.windSpeed ?? 0, wdir = d.winddir ?? 0, gust = d.imperial?.windGust ?? 0;
+            const pres = d.imperial?.pressure ?? '--', dew = d.imperial?.dewpt ?? '--', rain = d.imperial?.precipTotal ?? 0;
+            const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+            const dirLbl = dirs[Math.round(wdir / 22.5) % 16];
+            const cond = getCondition(d), bg = BACKGROUNDS[cond.type]?.[0] || BACKGROUNDS.cloudy[0];
+            const cmf = getComfort(d), circ = 2 * Math.PI * 26, off = circ - (cmf.score / 100) * circ;
+
+            let fcHtml = '';
+            if (fc?.daypart?.[0]) {
+                const dp = fc.daypart[0];
+                let start = dp.temperature?.[0] === null ? 1 : 0;
+                for (let i = start; i < Math.min(start + 3, dp.daypartName?.length || 0); i++) {
+                    if (dp.temperature?.[i] === null) continue;
+                    fcHtml += `<div class="forecast-item"><div class="forecast-period">${dp.daypartName[i]}</div><div class="forecast-text">${dp.narrative?.[i] || '--'}</div></div>`;
+                }
+            }
+            if (!fcHtml) fcHtml = '<div class="forecast-item"><div class="forecast-text">Forecast unavailable</div></div>';
+
+            const uid = cfg.id.replace(/\W/g, '');
+            return `
+            <div class="station">
+                <div class="station-bg" style="background-image:url('${bg}')"></div>
+                <div class="station-content">
+                    <div class="station-header">
+                        <div><div class="station-name">${cfg.name}</div><div class="station-location">${cfg.location}</div></div>
+                        <span class="badge live">● Live</span>
+                    </div>
+                    <div class="condition-tag">${cond.label}</div>
+
+                    <div class="comfort-row">
+                        <div class="comfort-ring-wrap">
+                            <svg class="comfort-ring" viewBox="0 0 60 60">
+                                <circle class="comfort-ring-bg" cx="30" cy="30" r="26"/>
+                                <circle class="comfort-ring-fill" cx="30" cy="30" r="26" stroke="${cmf.color}" stroke-dasharray="${circ}" stroke-dashoffset="${off}"/>
+                            </svg>
+                            <span class="comfort-num" style="color:${cmf.color}">${cmf.score}</span>
+                        </div>
+                        <div class="comfort-info">
+                            <div class="comfort-label">Comfort Score</div>
+                            <div class="comfort-status" style="color:${cmf.color}">${cmf.label}</div>
+                            <div class="comfort-desc">${cmf.desc}</div>
+                        </div>
+                    </div>
+
+                    <div class="wind-row">
+                        <div class="compass">
+                            <div class="compass-circle"></div>
+                            <div class="compass-dirs"><span class="n">N</span><span class="e">E</span><span class="s">S</span><span class="w">W</span></div>
+                            <div class="compass-needle" style="transform:translate(-50%,-100%) rotate(${wdir}deg)"></div>
+                        </div>
+                        <div class="wind-info">
+                            <div class="wind-speed">${wind}<span class="unit"> mph</span></div>
+                            <div class="wind-dir">From ${dirLbl} (${wdir}°)</div>
+                            ${gust > 0 ? `<div class="wind-gust">Gusts to ${gust} mph</div>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="temp-section">
+                        <div class="temp-row"><span class="temp-big">${Math.round(t)}</span><span class="temp-deg">°F</span></div>
+                        ${fl !== t ? `<div class="feels">Feels like <strong>${Math.round(fl)}°</strong></div>` : ''}
+                    </div>
+
+                    <div class="grid">
+                        <div class="cell"><div class="cell-icon">💧</div><div class="cell-label">Humidity</div><div class="cell-value">${hum}<span class="unit">%</span></div></div>
+                        <div class="cell"><div class="cell-icon">🌡️</div><div class="cell-label">Dew Pt</div><div class="cell-value">${dew}<span class="unit">°</span></div></div>
+                        <div class="cell"><div class="cell-icon">📊</div><div class="cell-label">Pressure</div><div class="cell-value">${pres}<span class="unit">″</span></div></div>
+                        <div class="cell"><div class="cell-icon">🌧️</div><div class="cell-label">Rain</div><div class="cell-value">${rain.toFixed(2)}<span class="unit">″</span></div></div>
+                        <div class="cell"><div class="cell-icon">☀️</div><div class="cell-label">UV</div><div class="cell-value">${d.uv ?? '--'}</div></div>
+                        <div class="cell"><div class="cell-icon">⚡</div><div class="cell-label">Solar</div><div class="cell-value">${d.solarRadiation ?? '--'}<span class="unit">w</span></div></div>
+                    </div>
+
+                    <button class="summary-btn" onclick="toggleSummary('${uid}')" id="btn-${uid}">
+                        <span>📋 Summary</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="summary-content" id="summary-${uid}">${fcHtml}</div>
+                </div>
+            </div>`;
+        }
+
+        function toggleSummary(id) {
+            document.getElementById(`summary-${id}`).classList.toggle('open');
+            document.getElementById(`btn-${id}`).classList.toggle('open');
+        }
+
+        async function refresh() {
+            const btn = document.getElementById('refreshBtn'), content = document.getElementById('content');
+            btn.classList.add('spinning');
+            let html = '', lastTime = null;
+
+            for (const st of STATIONS) {
+                try {
+                    const d = await fetchStation(st.id);
+                    let fc = null;
+                    if (d?.lat && d?.lon) {
+                        try {
+                            fc = await fetchForecast(d.lat, d.lon);
+                            if (!sunData && fc) {
+                                sunData = { sunrise: fc.sunriseTimeLocal?.[0], sunset: fc.sunsetTimeLocal?.[0] };
+                                updateSunTracker();
+                            }
+                        } catch (e) {}
+                    }
+                    html += renderStation(st, d, fc);
+                    if (d?.obsTimeLocal) lastTime = d.obsTimeLocal;
+                } catch (e) {
+                    html += `<div class="station"><div class="station-bg" style="background:#1e293b"></div><div class="station-content"><div class="station-header"><div><div class="station-name">${st.name}</div><div class="station-location">${st.location}</div></div><span class="badge offline">Error</span></div><div class="error"><p>${e.message}</p></div></div></div>`;
+                }
+            }
+
+            content.innerHTML = html;
+            if (lastTime) document.getElementById('stationTime').textContent = `Station reported: ${new Date(lastTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+            countdown = 60;
+            btn.classList.remove('spinning');
+        }
+
+        function tick() {
+            countdown--;
+            if (countdown <= 0) { refresh(); countdown = 60; }
+            document.getElementById('countdown').textContent = `${countdown}s`;
+            updateDateTime();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { updateDateTime(); refresh(); timer = setInterval(tick, 1000); });
+        if ('wakeLock' in navigator) navigator.wakeLock.request('screen').catch(() => {});
+        
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>
