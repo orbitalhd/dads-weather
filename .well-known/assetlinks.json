@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "dev.pages.dads_weather.twa",
+        "sha256_cert_fingerprints": ["65:88:73:CA:7A:DE:E4:2F:55:4E:2E:F1:8A:D6:FA:F7:DD:2D:01:5A:E7:7B:C1:3C:45:87:09:B9:7F:79:CA:65"]
+      }
+    }]
