@@ -561,8 +561,8 @@
                         <div class="cell"><div class="cell-icon">🌡️</div><div class="cell-label">Dew Pt</div><div class="cell-value">${dew}<span class="unit">°</span></div></div>
                         <div class="cell"><div class="cell-icon">📊</div><div class="cell-label">Pressure</div><div class="cell-value">${pres}<span class="unit">″</span></div></div>
                         <div class="cell"><div class="cell-icon">🌧️</div><div class="cell-label">Rain</div><div class="cell-value">${rain.toFixed(2)}<span class="unit">″</span></div></div>
-                        <div class="cell"><div class="cell-icon">☀️</div><div class="cell-label">UV</div><div class="cell-value">${d.uv ?? '--'}</div></div>
-                        <div class="cell"><div class="cell-icon">⚡</div><div class="cell-label">Solar</div><div class="cell-value">${d.solarRadiation ?? '--'}<span class="unit">w</span></div></div>
+                        <div class="cell"><div class="cell-icon">☀️</div><div class="cell-label">UV</div><div class="cell-value">${d.uv ?? '0'}</div></div>
+                        <div class="cell"><div class="cell-icon">⚡</div><div class="cell-label">Solar</div><div class="cell-value">${d.solarRadiation ?? '0'}<span class="unit">w</span></div></div>
                     </div>
 
                     <button class="summary-btn" onclick="toggleSummary('${uid}')" id="btn-${uid}">
