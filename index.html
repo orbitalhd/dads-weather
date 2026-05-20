@@ -154,7 +154,7 @@
         .forecast-period { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); margin-bottom: 4px; }
         .forecast-narrative { font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); }
 
-        /* Dynamic Sports Card styles */
+        /* Sports Tracker Card styles */
         .sports-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 24px; box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5); }
         .sports-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .sports-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing: -0.2px; }
@@ -163,7 +163,7 @@
         /* Sun Tracker */
         .sun-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 24px; box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5); }
         .sun-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .sun-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing: -0.2px; }
+        .sun-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; letter-spacing: -0.2px; }
         .golden-pill { padding: 4px 10px; border-radius: 100px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid transparent; }
         .golden-pill.active { background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.15) 100%); border-color: rgba(251, 191, 36, 0.2); color: var(--accent-amber); animation: goldenGlow 2.5s ease-in-out infinite; }
         .golden-pill.soon { background: rgba(251, 191, 36, 0.06); border-color: rgba(251, 191, 36, 0.1); color: var(--accent-amber); }
@@ -222,7 +222,7 @@
 
         <div class="sports-card" id="cubsCard" style="display: none;">
             <div class="sports-header">
-                <span class="sun-title">🐻 Chicago Cubs Tracker</span>
+                <span class="sports-title">🐻 Chicago Cubs Tracker</span>
                 <span class="sports-pill">MLB</span>
             </div>
             <div class="sun-stats-row" style="grid-template-columns: 1fr; gap: 10px;">
@@ -299,443 +299,31 @@
             const uv = data.uv ?? 0;
             const precipRate = data.imperial?.precipRate ?? 0;
 
-            if (temp == null) return { score: 0, label: 'Unknown', desc: 'Core parameters missing', color: '#666', tags: [] };
+            if (temp == null) return { score: 0, label: 'Unknown', desc: 'Temperature unavailable', color: '#666', tags: [] };
 
             let effective = temp;
-            if (temp <= 52 && windSpeed > 3 && windChill != null) effective = windChill;
-            else if (temp >= 78 && heatIndex != null) effective = heatIndex;
+            if (temp <= 50 && windSpeed > 3 && windChill != null) effective = windChill;
+            else if (temp >= 80 && heatIndex != null) effective = heatIndex;
 
+            let score = 100;
             let tags = [];
 
-            let thermalScore = 100;
-            if (effective >= 68 && effective <= 74) {
-                thermalScore = 100;
-            } else if (effective > 74) {
-                if (effective <= 78) thermalScore = 95;
-                else if (effective <= 83) { thermalScore = 82; tags.push('Warm'); }
-                else if (effective <= 88) { thermalScore = 65; tags.push('🌡️ Hot'); }
-                else if (effective <= 94) { thermalScore = 40; tags.push('🔥 Very Hot'); }
-                else if (effective <= 102) { thermalScore = 18; tags.push('🥵 Intense Heat'); }
-                else { thermalScore = 5; tags.push('☠️ Extreme Heat'); }
-            } else {
-                if (effective >= 62) thermalScore = 92;
-                else if (effective >= 55) { thermalScore = 78; tags.push('Cool'); }
-                else if (effective >= 45) { thermalScore = 60; tags.push('Chilly'); }
-                else if (effective >= 32) { thermalScore = 38; tags.push('🥶 Cold'); }
-                else if (effective >= 15) { thermalScore = 18; tags.push('🥶 Freezing'); }
-                else { thermalScore = 5; tags.push('❄️ Bitter Cold'); }
-            }
-
-            let humidityScore = 100;
-            if (dewpt != null && temp > 55) {
-                if (dewpt >= 76) { humidityScore = 10; tags.push('💦 Oppressive'); }
-                else if (dewpt >= 70) { humidityScore = 30; tags.push('💦 Very Sticky'); }
-                else if (dewpt >= 64) { humidityScore = 60; tags.push('💧 Humid'); }
-                else if (dewpt >= 58) { humidityScore = 85; tags.push('Noticeable'); }
-                else if (dewpt <= 25 && temp < 65) { humidityScore = 70; tags.push('🌵 Very Dry'); }
-            }
-
-            let finalScore = (temp > 58) ? (thermalScore * 0.55 + humidityScore * 0.45) : thermalScore;
-
-            if (windSpeed > 35 || windGust > 45) {
-                finalScore -= 25;
-                tags.push('💨 High Winds');
-            } else if (windSpeed > 18) {
-                if (effective < 50) { finalScore -= 12; tags.push('💨 Biting Wind'); }
-                else if (effective > 82) { finalScore += 5; tags.push('🍃 Refreshing Breeze'); }
-                else { finalScore -= 5; }
-            } else if (windSpeed >= 4 && windSpeed <= 12 && effective >= 75 && effective <= 88) {
-                finalScore += 4;
-            }
-
-            if (precipRate > 0.4) { finalScore -= 30; tags.push('⛈️ Heavy Rain'); }
-            else if (precipRate > 0.05) { finalScore -= 15; tags.push('🌧️ Wet'); }
-            else if (precipRate > 0) { finalScore -= 8; tags.push('💧 Drizzle'); }
-
-            if (uv >= 9) { finalScore -= 6; tags.push('☀️ Extreme UV'); }
-
-            finalScore = Math.max(0, Math.min(100, Math.round(finalScore)));
-
-            let label, desc, color;
-            if (finalScore >= 94) { label = 'Perfect'; desc = 'Absolute prime outdoor conditions. Exceptional air balance.'; color = '#10b981'; }
-            else if (finalScore >= 85) { label = 'Excellent'; desc = 'Highly comfortable. Great for any extended outdoor activities.'; color = '#34d399'; }
-            else if (finalScore >= 75) { label = 'Good'; desc = 'Generally pleasant. Slight temp offset or light moisture present.'; color = '#84cc16'; }
-            else if (finalScore >= 64) { label = 'Fair'; desc = 'Passable comfort. Noticeable moisture, minor wind chill, or thermal loading.'; color = '#eab308'; }
-            else if (finalScore >= 50) { label = 'Moderate'; desc = 'Suboptimal balance. Dress deliberately for the specific elements active.'; color = '#f59e0b'; }
-            else if (finalScore >= 36) { label = 'Poor'; desc = 'Uncomfortable ambient environment. True conditions are quite dominant.'; color = '#f97316'; }
-            else if (finalScore >= 22) { label = 'Bad'; desc = 'Highly unappealing conditions. Minimize prolonged outdoor exertion.'; color = '#ef4444'; }
-            else if (finalScore >= 10) { label = 'Harsh'; desc = 'Severe sensory discomfort. Environmental pressure is high.'; color = '#dc2626'; }
-            else { label = 'Dangerous'; desc = 'Extreme threat or deep systemic environmental discomfort. Stay interior.'; color = '#991b1b'; }
-
-            let uniqueTags = [...new Set(tags)].slice(0, 3);
-
-            return { score: finalScore, label, desc, color, tags: uniqueTags, effective };
-        }
-
-        function getWeatherCondition(data) {
-            if (!data) return { icon: '❓', text: 'Unknown' };
-            const temp = data.imperial?.temp;
-            const humidity = data.humidity ?? 0;
-            const wind = data.imperial?.windSpeed ?? 0;
-            const precip = data.imperial?.precipRate ?? 0;
-            const solar = data.solarRadiation ?? 0;
-            const uv = data.uv ?? 0;
-            const hour = new Date().getHours();
-            const isNight = hour < 6 || hour >= 21;
-
-            if (temp != null && temp <= 34 && precip > 0) return { icon: '❄️', text: 'Snow' };
-            if (precip > 0.35) return { icon: '⛈️', text: 'Heavy Rain' };
-            if (precip > 0.08) return { icon: '🌧️', text: 'Rain' };
-            if (precip > 0) return { icon: '🌦️', text: 'Light Rain' };
-            if (humidity > 94 && temp != null && temp < 52) return { icon: '🌫️', text: 'Dense Fog' };
-            if (temp != null && temp <= 18) return { icon: '🥶', text: 'Frigid' };
-            if (temp != null && temp <= 32) return { icon: '❄️', text: 'Freezing' };
-            if (temp != null && temp >= 98) return { icon: '🔥', text: 'Intense Heat' };
-            if (temp != null && temp >= 88) return { icon: '☀️', text: 'Hot' };
-            if (wind > 26) return { icon: '💨', text: 'High Wind' };
-            if (isNight) { return humidity < 68 ? { icon: '🌙', text: 'Clear Night' } : { icon: '☁️', text: 'Cloudy Night' }; }
-            if (solar > 650 || uv > 6) return { icon: '☀️', text: 'Clear Sky' };
-            if (solar > 350 || uv > 3) return { icon: '🌤️', text: 'Mostly Sunny' };
-            if (solar > 120) return { icon: '⛅', text: 'Partly Cloudy' };
-            return { icon: '☁️', text: 'Overcast' };
-        }
-
-        function getWindDir(degrees) {
-            const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
-            return dirs[Math.round(degrees / 22.5) % 16];
-        }
-        
-        function getFullWindDir(abbr) {
-            const map = {'N':'North','NNE':'North-Northeast','NE':'Northeast','ENE':'East-Northeast','E':'East','ESE':'East-Southeast','SE':'Southeast','SSE':'South-Southeast','S':'South','SSW':'South-Southwest','SW':'Southwest','WSW':'West-Southwest','W':'West','WNW':'West-Northwest','NW':'Northwest','NNW':'North-Northwest'};
-            return map[abbr] || abbr;
-        }
-
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clockDay').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
-            document.getElementById('clockTime').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-            document.getElementById('clockDate').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-            if (sunData) updateSunTracker();
-        }
-
-        function updateSunTracker() {
-            if (!sunData?.sunrise || !sunData?.sunset) return;
-            const now = new Date();
-            const sunrise = new Date(sunData.sunrise);
-            const sunset = new Date(sunData.sunset);
-            const goldenStart = new Date(sunset.getTime() - 60 * 60 * 1000);
-
-            document.getElementById('sunriseTime').textContent = sunrise.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-            document.getElementById('sunsetTime').textContent = sunset.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-            document.getElementById('goldenTime').textContent = goldenStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-
-            const total = sunset - sunrise;
-            const elapsed = now - sunrise;
-            let progress = Math.max(0, Math.min(1, elapsed / total));
-
-            const angle = Math.PI * progress;
-            const x = 50 - Math.cos(angle) * 44;
-            const y = 75 - Math.sin(angle) * 64;
-            const sunMarker = document.getElementById('sunMarker');
-            sunMarker.style.left = `${x}%`;
-            sunMarker.style.bottom = `${y}px`;
-
-            const remaining = sunset - now;
-            const daylightEl = document.getElementById('daylightLeft');
-            const pill = document.getElementById('goldenPill');
-
-            if (now < sunrise) { daylightEl.textContent = 'Pre-dawn'; sunMarker.textContent = '🌙'; pill.className = 'golden-pill inactive'; pill.textContent = 'Golden Hour'; }
-            else if (now > sunset) { daylightEl.textContent = 'Night'; sunMarker.textContent = '🌙'; pill.className = 'golden-pill inactive'; pill.textContent = 'Golden Hour'; }
-            else {
-                const h = Math.floor(remaining / 3600000);
-                const m = Math.floor((remaining % 3600000) / 60000);
-                daylightEl.textContent = `${h}h ${m}m`;
-                sunMarker.textContent = '☀️';
-
-                if (now >= goldenStart) {
-                    const left = Math.floor((sunset - now) / 60000);
-                    pill.className = 'golden-pill active';
-                    pill.textContent = `🎬 ${left}m left!`;
-                } else {
-                    const until = Math.floor((goldenStart - now) / 60000);
-                    if (until <= 120) {
-                        const uh = Math.floor(until / 60);
-                        const um = until % 60;
-                        pill.className = 'golden-pill soon';
-                        pill.textContent = uh > 0 ? `In ${uh}h ${um}m` : `In ${um}m`;
-                    } else { pill.className = 'golden-pill inactive'; pill.textContent = 'Golden Hour'; }
-                }
-            }
-        }
-
-        async function fetchCubsData() {
-            try {
-                const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/chc');
-                if (!res.ok) throw new Error('Cubs endpoint gateway error');
-                const json = await res.json();
-                const team = json.team;
-                if (!team) return;
-
-                if (team.nextEvent && team.nextEvent.length > 0) {
-                    const next = team.nextEvent[0];
-                    const gameDate = new Date(next.date);
-                    
-                    const numericDate = gameDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
-                    const writtenDay = gameDate.toLocaleDateString('en-US', { weekday: 'long' });
-                    const numericYear = gameDate.getFullYear();
-                    
-                    const timeStr = gameDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-                    const shortName = next.shortName ? ` (${next.shortName})` : '';
-
-                    document.getElementById('cubsNextGame').innerHTML = `<strong>${numericDate}</strong>, ${writtenDay} <strong>${numericYear}</strong> @ ${timeStr}${shortName}`;
-                } else {
-                    document.getElementById('cubsNextGame').textContent = 'No upcoming games scheduled';
-                }
-
-                const last = team.lastEvent ? (Array.isArray(team.lastEvent) ? team.lastEvent[0] : team.lastEvent) : null;
-                if (last && last.competitions && last.competitions[0]) {
-                    const comp = last.competitions[0];
-                    const competitors = comp.competitors || [];
-                    
-                    let cubsScore = null;
-                    let oppScore = null;
-                    let oppName = '';
-
-                    competitors.forEach(teamObj => {
-                        const isCubs = teamObj.team?.abbreviation === 'CHC' || teamObj.team?.id === '16';
-                        const scoreStr = teamObj.score?.displayValue || teamObj.score || '0';
-                        if (isCubs) {
-                            cubsScore = parseInt(scoreStr);
-                        } else {
-                            oppScore = parseInt(scoreStr);
-                            oppName = teamObj.team?.abbreviation || teamObj.team?.shortDisplayName || 'OPP';
-                        }
-                    });
-
-                    if (cubsScore !== null && oppScore !== null) {
-                        const winLossMark = cubsScore > oppScore ? '🟢 W' : (cubsScore < oppScore ? '🔴 L' : '⚪ T');
-                        document.getElementById('cubsPrevGame').textContent = `CHC ${cubsScore} - ${oppScore} ${oppName} (${winLossMark})`;
-                    } else {
-                        document.getElementById('cubsPrevGame').textContent = 'Score calculations incomplete';
-                    }
-                } else {
-                    document.getElementById('cubsPrevGame').textContent = 'Historical scoreboard log empty';
-                }
-
-                document.getElementById('cubsCard').style.display = 'block';
-            } catch (err) {
-                console.warn('Cubs telemetry stream timed out:', err);
-            }
-        }
-
-        async function fetchStation(stationId) {
-            const url = `https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=e&apiKey=${API_KEY}`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const json = await res.json();
-            return json.observations?.[0] || null;
-        }
-
-        async function fetchForecast(lat, lon) {
-            const url = `https://api.weather.com/v3/wx/forecast/daily/5day?geocode=${lat},${lon}&format=json&units=e&language=en-US&apiKey=${API_KEY}`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return await res.json();
-        }
-
-        function renderStation(config, data, forecast) {
-            if (!data) {
-                return `<div class="station"><div class="station-header"><div><div class="station-name">${config.name}</div><div class="station-location">${config.location}</div></div><span class="station-status offline">● Offline</span></div><div class="error-state" style="margin: 24px;">Station gateway telemetry timeout</div></div>`;
-            }
-
-            // Extract values strictly without assuming presence
-            const temp = data.imperial?.temp;
-            const humidity = data.humidity;
-            const dewpt = data.imperial?.dewpt;
-            const windSpeed = data.imperial?.windSpeed;
-            const windDir = data.winddir ?? 0;
-            const windGust = data.imperial?.windGust;
-            const pressure = data.imperial?.pressure;
-            const precipTotal = data.imperial?.precipTotal;
-            const uv = data.uv;
-            const solar = data.solarRadiation;
-
-            const lightningCount = data.lightningStrikeCount ?? 
-                                   data.lightningCount ?? 
-                                   data.lightning ?? 
-                                   data.lightning_day ?? 
-                                   data.lightningDay ?? 
-                                   data.imperial?.lightningCount ?? 0;
-
-            let feelsLike = temp;
-            const windChill = data.imperial?.windChill;
-            const heatIndex = data.imperial?.heatIndex;
-            if (typeof temp === 'number') {
-                if (temp <= 52 && windChill != null) feelsLike = windChill;
-                else if (temp >= 78 && heatIndex != null) feelsLike = heatIndex;
-            }
-
-            // SAFE DEFENSIVE TYPE FORMATTERS
-            const tempDisplay = (typeof temp === 'number') ? `${Math.round(temp)}` : '--';
-            const feelsLikeDisplay = (typeof feelsLike === 'number') ? `${Math.round(feelsLike)}` : '--';
-            const humidityDisplay = (typeof humidity === 'number') ? `${humidity}` : '--';
-            const dewptDisplay = (typeof dewpt === 'number') ? `${Math.round(dewpt)}` : '--';
-            const pressureDisplay = (typeof pressure === 'number') ? pressure.toFixed(2) : '--';
-            const precipDisplay = (typeof precipTotal === 'number') ? precipTotal.toFixed(2) : '0.00';
-            const windSpeedDisplay = (typeof windSpeed === 'number') ? `${Math.round(windSpeed)}` : '0';
-            const windGustDisplay = (typeof windGust === 'number') ? `${Math.round(windGust)}` : '0';
-
-            const windDirAbbr = getWindDir(windDir);
-            const windDirFull = getFullWindDir(windDirAbbr);
-            const condition = getWeatherCondition(data);
-            const comfort = calculateComfortIndex(data);
-
-            const circumference = 2 * Math.PI * 72;
-            const offset = circumference - (comfort.score / 100) * circumference;
-
-            let forecastHtml = '';
-            if (forecast?.daypart?.[0]) {
-                const dp = forecast.daypart[0];
-                let startIdx = dp.temperature?.[0] === null ? 1 : 0;
-                for (let i = startIdx; i < Math.min(startIdx + 3, dp.daypartName?.length ?? 0); i++) {
-                    if (dp.temperature?.[i] === null) continue;
-                    forecastHtml += `<div class="forecast-item"><div class="forecast-period">${dp.daypartName[i]}</div><div class="forecast-narrative">${dp.narrative?.[i] || 'Forecast narrative unavailable'}</div></div>`;
-                }
-            }
-            if (!forecastHtml) forecastHtml = '<div class="forecast-item"><div class="forecast-narrative">Extended outlook unavailable</div></div>';
-
-            const uid = config.id;
-
-            let dataCells = `
-                <div class="data-cell"><div class="data-icon">💧</div><div class="data-label">Humidity</div><div class="data-value">${humidityDisplay}<span class="unit">%</span></div></div>
-                <div class="data-cell"><div class="data-icon">🌡️</div><div class="data-label">Dew Point</div><div class="data-value">${dewptDisplay}<span class="unit">°</span></div></div>
-                <div class="data-cell"><div class="data-icon">📊</div><div class="data-label">Pressure</div><div class="data-value">${pressureDisplay}<span class="unit">"</span></div></div>
-                <div class="data-cell"><div class="data-icon">🌧️</div><div class="data-label">Rain Today</div><div class="data-value">${precipDisplay}<span class="unit">"</span></div></div>`;
-
-            if (config.hasSolar) {
-                dataCells += `<div class="data-cell"><div class="data-icon">☀️</div><div class="data-label">UV Index</div><div class="data-value">${uv ?? 0}</div></div>`;
-                dataCells += `<div class="data-cell"><div class="data-icon">⚡</div><div class="data-label">Solar</div><div class="data-value">${solar ?? 0}<span class="unit">w</span></div></div>`;
-            }
-
-            let lightningHtml = '';
-            if (config.hasLightning) {
-                const isActive = lightningCount > 0;
-                lightningHtml = `
-                    <div class="lightning-section ${isActive ? 'active-strikes' : ''}">
-                        <div class="lightning-icon-wrap">⚡</div>
-                        <div class="lightning-info">
-                            <h4>Lightning Tracker</h4>
-                            <div class="lightning-count">${lightningCount}<span class="period">strikes today</span></div>
-                        </div>
-                    </div>`;
-            }
-
-            return `
-                <div class="station">
-                    <div class="station-header"><div><div class="station-name">${config.name}</div><div class="station-location">${config.location}</div></div><span class="station-status">● Live</span></div>
-                    
-                    <div class="comfort-section">
-                        <div class="comfort-ring-wrap">
-                            <svg class="comfort-ring-svg" viewBox="0 0 160 160">
-                                <circle class="comfort-ring-bg" cx="80" cy="80" r="72"/>
-                                <circle class="comfort-ring-fill" cx="80" cy="80" r="72" stroke="${comfort.color}" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" style="filter: drop-shadow(0 0 8px ${comfort.color}40);"/>
-                            </svg>
-                            <div class="comfort-center">
-                                <div class="comfort-value" style="color: ${comfort.color}">${comfort.score}</div>
-                                <div class="comfort-label" style="color: ${comfort.color}">${comfort.label}</div>
-                            </div>
-                        </div>
-                        <div class="comfort-desc">${comfort.desc}</div>
-                        ${comfort.tags.length > 0 ? `<div class="comfort-tags">${comfort.tags.map(t => `<span class="comfort-tag">${t}</span>`).join('')}</div>` : ''}
-                    </div>
-
-                    <div class="temp-section">
-                        <div class="temp-main">
-                            <div class="temp-value">${tempDisplay}<span class="deg">°F</span></div>
-                            ${typeof feelsLike === 'number' && typeof temp === 'number' && Math.round(feelsLike) !== Math.round(temp) ? `<div class="temp-feels">Feels like <strong>${feelsLikeDisplay}°</strong></div>` : ''}
-                        </div>
-                        <div class="condition-chip"><div class="condition-icon">${condition.icon}</div><div class="condition-text">${condition.text}</div></div>
-                    </div>
-
-                    <div class="wind-section">
-                        <div class="compass-container">
-                            <div class="compass-ring"></div>
-                            <div class="compass-dirs"><span class="n">N</span><span class="e">E</span><span class="s">S</span><span class="w">W</span></div>
-                            <div class="compass-needle" style="transform: translate(-50%, -100%) rotate(${windDir}deg);"></div>
-                            <div class="compass-center-dot"></div>
-                        </div>
-                        <div class="wind-info">
-                            <div class="wind-speed">${windSpeedDisplay}<span class="unit">mph</span></div>
-                            <div class="wind-direction-text">From the ${windDirFull} (${windDir}°)</div>
-                            ${typeof windGust === 'number' && typeof windSpeed === 'number' && windGust > windSpeed ? `<div class="wind-gust-alert">⚠️ Gusts to ${windGustDisplay} mph</div>` : ''}
-                        </div>
-                    </div>
-
-                    <div class="data-grid">${dataCells}</div>
-                    ${lightningHtml}
-                    
-                    <button class="forecast-toggle" onclick="toggleForecast('${uid}')" id="btn-${uid}">
-                        📋 Extended Outlook
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-                    </button>
-                    <div class="forecast-content" id="forecast-${uid}">${forecastHtml}</div>
-                </div>`;
-        }
-
-        function toggleForecast(id) {
-            document.getElementById(`forecast-${id}`).classList.toggle('open');
-            document.getElementById(`btn-${id}`).classList.toggle('open');
-        }
-
-        async function refresh() {
-            const btn = document.getElementById('refreshBtn');
-            const content = document.getElementById('content');
-            btn.classList.add('spinning');
-
-            fetchCubsData();
-
-            let html = '';
-            for (const station of STATIONS) {
-                try {
-                    const data = await fetchStation(station.id);
-                    let forecast = null;
-                    if (data?.lat && data?.lon) {
-                        try {
-                            forecast = await fetchForecast(data.lat, data.lon);
-                            if (!sunData && forecast) {
-                                sunData = { sunrise: forecast.sunriseTimeLocal?.[0], sunset: forecast.sunsetTimeLocal?.[0] };
-                                document.getElementById('sunCard').style.display = 'block';
-                                updateSunTracker();
-                            }
-                        } catch (e) { console.warn('Forecast array mismatch:', e); }
-                    }
-                    html += renderStation(station, data, forecast);
-                } catch (err) {
-                    console.error(`Telemetry error on ${station.id}:`, err);
-                    html += renderStation(station, null, null);
-                }
-            }
-
-            content.innerHTML = html;
-            countdown = 60;
-            btn.classList.remove('spinning');
-        }
-
-        function tick() {
-            countdown--;
-            if (countdown <= 0) { refresh(); countdown = 60; }
-            document.getElementById('countdown').textContent = `${countdown}s`;
-            updateClock();
-        }
-
-        document.addEventListener('DOMContentLoaded', () => { 
-            updateClock(); 
-            refresh(); 
-            setInterval(tick, 1000); 
-        });
-        
-        if ('wakeLock' in navigator) navigator.wakeLock.request('screen').catch(() => {});
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
-    </script>
-</body>
-</html>
+            if (effective <= -10) { score -= 90; tags.push('☠️ Extreme danger'); }
+            else if (effective <= 0) { score -= 80; tags.push('🥶 Dangerous cold'); }
+            else if (effective <= 10) { score -= 70; tags.push('🥶 Severe cold'); }
+            else if (effective <= 20) { score -= 60; tags.push('🥶 Bitter cold'); }
+            else if (effective <= 32) { score -= 50; tags.push('❄️ Freezing'); }
+            else if (effective <= 40) { score -= 40; tags.push('🧊 Very cold'); }
+            else if (effective <= 45) { score -= 32; tags.push('Cold'); }
+            else if (effective <= 50) { score -= 25; tags.push('Chilly'); }
+            else if (effective <= 55) { score -= 18; tags.push('Cool'); }
+            else if (effective <= 60) { score -= 10; tags.push('Mild'); }
+            else if (effective <= 65) { score -= 4; }
+            else if (effective <= 75) { score += 5; tags.push('👌 Ideal'); }
+            else if (effective <= 80) { score -= 5; tags.push('Warm'); }
+            else if (effective <= 85) { score -= 15; tags.push('🌡️ Hot'); }
+            else if (effective <= 90) { score -= 28; tags.push('🔥 Very hot'); }
+            else if (effective <= 95) { score -= 42; tags.push('🔥 Extreme heat'); }
+            else if (effective <= 100) { score -= 58; tags.push('☠️ Dangerous heat'); }
+            else if (effective <= 110) { score -= 75; tags.push('☠️ Deadly heat'); }
+            else { score -= 90; tags.push('☠️ Unsurvivable'); }
