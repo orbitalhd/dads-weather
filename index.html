@@ -468,7 +468,6 @@
             }
         }
 
-        // ASYNC CHICAGO CUBS TELEMETRY PARSER
         async function fetchCubsData() {
             try {
                 const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/chc');
@@ -477,12 +476,10 @@
                 const team = json.team;
                 if (!team) return;
 
-                // 1. Parse Next Game Info
                 if (team.nextEvent && team.nextEvent.length > 0) {
                     const next = team.nextEvent[0];
                     const gameDate = new Date(next.date);
                     
-                    // Numeric Date, Written Day of Week, Numeric Year Formatting
                     const numericDate = gameDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
                     const writtenDay = gameDate.toLocaleDateString('en-US', { weekday: 'long' });
                     const numericYear = gameDate.getFullYear();
@@ -495,7 +492,6 @@
                     document.getElementById('cubsNextGame').textContent = 'No upcoming games scheduled';
                 }
 
-                // 2. Parse Previous Game Final Score
                 const last = team.lastEvent ? (Array.isArray(team.lastEvent) ? team.lastEvent[0] : team.lastEvent) : null;
                 if (last && last.competitions && last.competitions[0]) {
                     const comp = last.competitions[0];
@@ -552,14 +548,15 @@
                 return `<div class="station"><div class="station-header"><div><div class="station-name">${config.name}</div><div class="station-location">${config.location}</div></div><span class="station-status offline">● Offline</span></div><div class="error-state" style="margin: 24px;">Station gateway telemetry timeout</div></div>`;
             }
 
-            const temp = data.imperial?.temp ?? '--';
-            const humidity = data.humidity ?? '--';
-            const dewpt = data.imperial?.dewpt ?? '--';
-            const windSpeed = data.imperial?.windSpeed ?? 0;
+            // Extract values strictly without assuming presence
+            const temp = data.imperial?.temp;
+            const humidity = data.humidity;
+            const dewpt = data.imperial?.dewpt;
+            const windSpeed = data.imperial?.windSpeed;
             const windDir = data.winddir ?? 0;
-            const windGust = data.imperial?.windGust ?? 0;
-            const pressure = data.imperial?.pressure ?? '--';
-            const precipTotal = data.imperial?.precipTotal ?? 0;
+            const windGust = data.imperial?.windGust;
+            const pressure = data.imperial?.pressure;
+            const precipTotal = data.imperial?.precipTotal;
             const uv = data.uv;
             const solar = data.solarRadiation;
 
@@ -570,13 +567,23 @@
                                    data.lightningDay ?? 
                                    data.imperial?.lightningCount ?? 0;
 
+            let feelsLike = temp;
             const windChill = data.imperial?.windChill;
             const heatIndex = data.imperial?.heatIndex;
-            let feelsLike = temp;
-            if (temp !== '--') {
+            if (typeof temp === 'number') {
                 if (temp <= 52 && windChill != null) feelsLike = windChill;
                 else if (temp >= 78 && heatIndex != null) feelsLike = heatIndex;
             }
+
+            // SAFE DEFENSIVE TYPE FORMATTERS
+            const tempDisplay = (typeof temp === 'number') ? `${Math.round(temp)}` : '--';
+            const feelsLikeDisplay = (typeof feelsLike === 'number') ? `${Math.round(feelsLike)}` : '--';
+            const humidityDisplay = (typeof humidity === 'number') ? `${humidity}` : '--';
+            const dewptDisplay = (typeof dewpt === 'number') ? `${Math.round(dewpt)}` : '--';
+            const pressureDisplay = (typeof pressure === 'number') ? pressure.toFixed(2) : '--';
+            const precipDisplay = (typeof precipTotal === 'number') ? precipTotal.toFixed(2) : '0.00';
+            const windSpeedDisplay = (typeof windSpeed === 'number') ? `${Math.round(windSpeed)}` : '0';
+            const windGustDisplay = (typeof windGust === 'number') ? `${Math.round(windGust)}` : '0';
 
             const windDirAbbr = getWindDir(windDir);
             const windDirFull = getFullWindDir(windDirAbbr);
@@ -600,10 +607,10 @@
             const uid = config.id;
 
             let dataCells = `
-                <div class="data-cell"><div class="data-icon">💧</div><div class="data-label">Humidity</div><div class="data-value">${humidity}<span class="unit">%</span></div></div>
-                <div class="data-cell"><div class="data-icon">🌡️</div><div class="data-label">Dew Point</div><div class="data-value">${Math.round(dewpt)}<span class="unit">°</span></div></div>
-                <div class="data-cell"><div class="data-icon">📊</div><div class="data-label">Pressure</div><div class="data-value">${pressure.toFixed(2)}<span class="unit">"</span></div></div>
-                <div class="data-cell"><div class="data-icon">🌧️</div><div class="data-label">Rain Today</div><div class="data-value">${precipTotal.toFixed(2)}<span class="unit">"</span></div></div>`;
+                <div class="data-cell"><div class="data-icon">💧</div><div class="data-label">Humidity</div><div class="data-value">${humidityDisplay}<span class="unit">%</span></div></div>
+                <div class="data-cell"><div class="data-icon">🌡️</div><div class="data-label">Dew Point</div><div class="data-value">${dewptDisplay}<span class="unit">°</span></div></div>
+                <div class="data-cell"><div class="data-icon">📊</div><div class="data-label">Pressure</div><div class="data-value">${pressureDisplay}<span class="unit">"</span></div></div>
+                <div class="data-cell"><div class="data-icon">🌧️</div><div class="data-label">Rain Today</div><div class="data-value">${precipDisplay}<span class="unit">"</span></div></div>`;
 
             if (config.hasSolar) {
                 dataCells += `<div class="data-cell"><div class="data-icon">☀️</div><div class="data-label">UV Index</div><div class="data-value">${uv ?? 0}</div></div>`;
@@ -644,8 +651,8 @@
 
                     <div class="temp-section">
                         <div class="temp-main">
-                            <div class="temp-value">${Math.round(temp)}<span class="deg">°F</span></div>
-                            ${Math.round(feelsLike) !== Math.round(temp) ? `<div class="temp-feels">Feels like <strong>${Math.round(feelsLike)}°</strong></div>` : ''}
+                            <div class="temp-value">${tempDisplay}<span class="deg">°F</span></div>
+                            ${typeof feelsLike === 'number' && typeof temp === 'number' && Math.round(feelsLike) !== Math.round(temp) ? `<div class="temp-feels">Feels like <strong>${feelsLikeDisplay}°</strong></div>` : ''}
                         </div>
                         <div class="condition-chip"><div class="condition-icon">${condition.icon}</div><div class="condition-text">${condition.text}</div></div>
                     </div>
@@ -658,9 +665,9 @@
                             <div class="compass-center-dot"></div>
                         </div>
                         <div class="wind-info">
-                            <div class="wind-speed">${Math.round(windSpeed)}<span class="unit">mph</span></div>
+                            <div class="wind-speed">${windSpeedDisplay}<span class="unit">mph</span></div>
                             <div class="wind-direction-text">From the ${windDirFull} (${windDir}°)</div>
-                            ${windGust > windSpeed ? `<div class="wind-gust-alert">⚠️ Gusts to ${Math.round(windGust)} mph</div>` : ''}
+                            ${typeof windGust === 'number' && typeof windSpeed === 'number' && windGust > windSpeed ? `<div class="wind-gust-alert">⚠️ Gusts to ${windGustDisplay} mph</div>` : ''}
                         </div>
                     </div>
 
@@ -685,7 +692,6 @@
             const content = document.getElementById('content');
             btn.classList.add('spinning');
 
-            // Trigger sports telemetry update asynchronously alongside weather updates
             fetchCubsData();
 
             let html = '';
