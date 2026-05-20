@@ -154,6 +154,12 @@
         .forecast-period { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); margin-bottom: 4px; }
         .forecast-narrative { font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); }
 
+        /* Dynamic Sports Card styles */
+        .sports-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 24px; box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5); }
+        .sports-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .sports-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing: -0.2px; }
+        .sports-pill { padding: 4px 10px; border-radius: 100px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(59, 130, 246, 0.15); background: rgba(59, 130, 246, 0.06); color: var(--accent-blue); }
+
         /* Sun Tracker */
         .sun-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 24px; box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5); }
         .sun-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -214,6 +220,23 @@
             </div>
         </main>
 
+        <div class="sports-card" id="cubsCard" style="display: none;">
+            <div class="sports-header">
+                <span class="sun-title">🐻 Chicago Cubs Tracker</span>
+                <span class="sports-pill">MLB</span>
+            </div>
+            <div class="sun-stats-row" style="grid-template-columns: 1fr; gap: 10px;">
+                <div class="sun-stat" style="text-align: left;">
+                    <div class="sun-stat-label">Next Chicago Cubs Game Coming Up</div>
+                    <div class="sun-stat-value" id="cubsNextGame" style="font-family: inherit; font-size: 14px; margin-top: 4px; line-height: 1.4;">--</div>
+                </div>
+                <div class="sun-stat" style="text-align: left;">
+                    <div class="sun-stat-label">Previous Game Final Score</div>
+                    <div class="sun-stat-value gold" id="cubsPrevGame" style="font-size: 15px; margin-top: 4px;">--</div>
+                </div>
+            </div>
+        </div>
+
         <div class="sun-card" id="sunCard" style="display: none;">
             <div class="sun-header">
                 <span class="sun-title">🚁 Golden Hour Tracker</span>
@@ -263,7 +286,6 @@
         let countdown = 60;
         let sunData = null;
 
-        // MULTI-VARIATE BALANCED COMFORT INDEX ALGORITHM
         function calculateComfortIndex(data) {
             if (!data) return { score: 0, label: 'Unknown', desc: 'No data available', color: '#666', tags: [] };
 
@@ -285,7 +307,6 @@
 
             let tags = [];
 
-            // 1. THERMAL SCORE COMPONENT (Base: 100 points)
             let thermalScore = 100;
             if (effective >= 68 && effective <= 74) {
                 thermalScore = 100;
@@ -305,7 +326,6 @@
                 else { thermalScore = 5; tags.push('❄️ Bitter Cold'); }
             }
 
-            // 2. HUMIDITY / DEW POINT COMPONENT
             let humidityScore = 100;
             if (dewpt != null && temp > 55) {
                 if (dewpt >= 76) { humidityScore = 10; tags.push('💦 Oppressive'); }
@@ -315,10 +335,8 @@
                 else if (dewpt <= 25 && temp < 65) { humidityScore = 70; tags.push('🌵 Very Dry'); }
             }
 
-            // Blended baseline index score
             let finalScore = (temp > 58) ? (thermalScore * 0.55 + humidityScore * 0.45) : thermalScore;
 
-            // 3. ENVIRONMENTAL PENALTIES & BONUSES
             if (windSpeed > 35 || windGust > 45) {
                 finalScore -= 25;
                 tags.push('💨 High Winds');
@@ -327,7 +345,7 @@
                 else if (effective > 82) { finalScore += 5; tags.push('🍃 Refreshing Breeze'); }
                 else { finalScore -= 5; }
             } else if (windSpeed >= 4 && windSpeed <= 12 && effective >= 75 && effective <= 88) {
-                finalScore += 4; // Minor comfort bonus for light ventilation in heat
+                finalScore += 4;
             }
 
             if (precipRate > 0.4) { finalScore -= 30; tags.push('⛈️ Heavy Rain'); }
@@ -338,7 +356,6 @@
 
             finalScore = Math.max(0, Math.min(100, Math.round(finalScore)));
 
-            // 4. DYNAMIC BRACKETS & COPY MATRIX
             let label, desc, color;
             if (finalScore >= 94) { label = 'Perfect'; desc = 'Absolute prime outdoor conditions. Exceptional air balance.'; color = '#10b981'; }
             else if (finalScore >= 85) { label = 'Excellent'; desc = 'Highly comfortable. Great for any extended outdoor activities.'; color = '#34d399'; }
@@ -350,7 +367,6 @@
             else if (finalScore >= 10) { label = 'Harsh'; desc = 'Severe sensory discomfort. Environmental pressure is high.'; color = '#dc2626'; }
             else { label = 'Dangerous'; desc = 'Extreme threat or deep systemic environmental discomfort. Stay interior.'; color = '#991b1b'; }
 
-            // Deduplicate tags and limit size
             let uniqueTags = [...new Set(tags)].slice(0, 3);
 
             return { score: finalScore, label, desc, color, tags: uniqueTags, effective };
@@ -452,6 +468,70 @@
             }
         }
 
+        // ASYNC CHICAGO CUBS TELEMETRY PARSER
+        async function fetchCubsData() {
+            try {
+                const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/chc');
+                if (!res.ok) throw new Error('Cubs endpoint gateway error');
+                const json = await res.json();
+                const team = json.team;
+                if (!team) return;
+
+                // 1. Parse Next Game Info
+                if (team.nextEvent && team.nextEvent.length > 0) {
+                    const next = team.nextEvent[0];
+                    const gameDate = new Date(next.date);
+                    
+                    // Numeric Date, Written Day of Week, Numeric Year Formatting
+                    const numericDate = gameDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
+                    const writtenDay = gameDate.toLocaleDateString('en-US', { weekday: 'long' });
+                    const numericYear = gameDate.getFullYear();
+                    
+                    const timeStr = gameDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                    const shortName = next.shortName ? ` (${next.shortName})` : '';
+
+                    document.getElementById('cubsNextGame').innerHTML = `<strong>${numericDate}</strong>, ${writtenDay} <strong>${numericYear}</strong> @ ${timeStr}${shortName}`;
+                } else {
+                    document.getElementById('cubsNextGame').textContent = 'No upcoming games scheduled';
+                }
+
+                // 2. Parse Previous Game Final Score
+                const last = team.lastEvent ? (Array.isArray(team.lastEvent) ? team.lastEvent[0] : team.lastEvent) : null;
+                if (last && last.competitions && last.competitions[0]) {
+                    const comp = last.competitions[0];
+                    const competitors = comp.competitors || [];
+                    
+                    let cubsScore = null;
+                    let oppScore = null;
+                    let oppName = '';
+
+                    competitors.forEach(teamObj => {
+                        const isCubs = teamObj.team?.abbreviation === 'CHC' || teamObj.team?.id === '16';
+                        const scoreStr = teamObj.score?.displayValue || teamObj.score || '0';
+                        if (isCubs) {
+                            cubsScore = parseInt(scoreStr);
+                        } else {
+                            oppScore = parseInt(scoreStr);
+                            oppName = teamObj.team?.abbreviation || teamObj.team?.shortDisplayName || 'OPP';
+                        }
+                    });
+
+                    if (cubsScore !== null && oppScore !== null) {
+                        const winLossMark = cubsScore > oppScore ? '🟢 W' : (cubsScore < oppScore ? '🔴 L' : '⚪ T');
+                        document.getElementById('cubsPrevGame').textContent = `CHC ${cubsScore} - ${oppScore} ${oppName} (${winLossMark})`;
+                    } else {
+                        document.getElementById('cubsPrevGame').textContent = 'Score calculations incomplete';
+                    }
+                } else {
+                    document.getElementById('cubsPrevGame').textContent = 'Historical scoreboard log empty';
+                }
+
+                document.getElementById('cubsCard').style.display = 'block';
+            } catch (err) {
+                console.warn('Cubs telemetry stream timed out:', err);
+            }
+        }
+
         async function fetchStation(stationId) {
             const url = `https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=e&apiKey=${API_KEY}`;
             const res = await fetch(url);
@@ -483,7 +563,6 @@
             const uv = data.uv;
             const solar = data.solarRadiation;
 
-            // COMPREHENSIVE LIGHTNING FALLBACK KEY PARSING
             const lightningCount = data.lightningStrikeCount ?? 
                                    data.lightningCount ?? 
                                    data.lightning ?? 
@@ -605,6 +684,9 @@
             const btn = document.getElementById('refreshBtn');
             const content = document.getElementById('content');
             btn.classList.add('spinning');
+
+            // Trigger sports telemetry update asynchronously alongside weather updates
+            fetchCubsData();
 
             let html = '';
             for (const station of STATIONS) {
