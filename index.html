@@ -8,15 +8,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Franklin Weather">
     <link rel="apple-touch-icon" href="./icons/icon-192.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="./icons/icon-192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-192.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="./icons/icon-192.png">
-    
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#080c14">
     <link rel="manifest" href="./manifest.json">
     
-    <meta name="description" content="Real-time weather from personal weather stations in Franklin, Tennessee">
     <title>Franklin TN Real-Time Weather</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,7 +55,7 @@
         }
         .container { max-width: 480px; margin: 0 auto; }
 
-        /* Header */
+        /* Header Layout */
         .header { text-align: center; padding: 8px 0 24px; }
         .clock { margin-bottom: 16px; }
         .clock-day { font-size: 11px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
@@ -73,7 +68,7 @@
         .status-dot { width: 6px; height: 6px; background: var(--accent-emerald); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        /* Station Card */
+        /* Dashboard Cards */
         .station { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); margin-bottom: 20px; overflow: hidden; }
         .station-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 20px 0; }
         .station-name { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px; }
@@ -81,12 +76,12 @@
         .station-status { display: flex; align-items: center; gap: 5px; padding: 5px 10px; background: rgba(52, 211, 153, 0.1); border-radius: 100px; font-size: 10px; font-weight: 700; color: var(--accent-emerald); text-transform: uppercase; letter-spacing: 0.5px; }
         .station-status.offline { background: rgba(251, 113, 133, 0.1); color: var(--accent-rose); }
 
-        /* Comfort Score */
+        /* Comfort Rings */
         .comfort-section { padding: 24px 20px 20px; text-align: center; }
         .comfort-ring-wrap { position: relative; width: 180px; height: 180px; margin: 0 auto 20px; }
         .comfort-ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
         .comfort-ring-bg { fill: none; stroke: var(--bg-elevated); stroke-width: 14; }
-        .comfort-ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease; filter: drop-shadow(0 0 20px currentColor); }
+        .comfort-ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease; }
         .comfort-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
         .comfort-value { font-family: 'Space Grotesk', monospace; font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -2px; }
         .comfort-label { font-size: 16px; font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
@@ -94,7 +89,7 @@
         .comfort-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
         .comfort-tag { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: var(--bg-elevated); border-radius: 100px; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
 
-        /* Temperature */
+        /* Temperature layout */
         .temp-section { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 0 20px 24px; }
         .temp-main { text-align: center; }
         .temp-value { font-family: 'Space Grotesk', monospace; font-size: 80px; font-weight: 700; line-height: 0.9; letter-spacing: -4px; }
@@ -105,7 +100,7 @@
         .condition-icon { font-size: 32px; }
         .condition-text { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 
-        /* Wind */
+        /* Compass Layout */
         .wind-section { display: flex; align-items: center; gap: 20px; padding: 0 20px 20px; }
         .compass-container { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
         .compass-ring { position: absolute; inset: 0; border: 2px solid var(--border-medium); border-radius: 50%; background: var(--bg-elevated); }
@@ -124,7 +119,7 @@
         .wind-direction-text { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
         .wind-gust-alert { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 6px 12px; background: rgba(251, 146, 60, 0.15); border-radius: 100px; font-size: 13px; font-weight: 600; color: var(--accent-orange); }
 
-        /* Data Grid */
+        /* Data Matrix Grid */
         .data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border-subtle); border-top: 1px solid var(--border-subtle); }
         .data-cell { background: var(--bg-card); padding: 18px 12px; text-align: center; }
         .data-icon { font-size: 22px; margin-bottom: 8px; }
@@ -132,14 +127,14 @@
         .data-value { font-family: 'Space Grotesk', monospace; font-size: 20px; font-weight: 700; }
         .data-value .unit { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
 
-        /* Lightning */
+        /* Lightning Tracking Bar */
         .lightning-section { display: flex; align-items: center; gap: 16px; padding: 18px 20px; background: linear-gradient(135deg, rgba(167, 139, 250, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%); border-top: 1px solid var(--border-subtle); }
         .lightning-icon-wrap { width: 52px; height: 52px; background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 0 30px -8px rgba(167, 139, 250, 0.5); }
         .lightning-info h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 2px; }
         .lightning-count { font-family: 'Space Grotesk', monospace; font-size: 28px; font-weight: 700; color: var(--accent-purple); }
         .lightning-count .period { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-left: 4px; }
 
-        /* Forecast */
+        /* Forecast Dropdown */
         .forecast-toggle { width: 100%; padding: 16px 20px; background: transparent; border: none; border-top: 1px solid var(--border-subtle); color: var(--text-primary); font-family: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: background 0.2s; }
         .forecast-toggle:active { background: var(--bg-elevated); }
         .forecast-toggle svg { transition: transform 0.3s ease; }
@@ -150,13 +145,13 @@
         .forecast-period { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); margin-bottom: 6px; }
         .forecast-narrative { font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
 
-        /* Sports Card styles */
-        .sports-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 24px; box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5); }
+        /* Sports Tracker Layout Component */
+        .sports-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 20px; box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5); }
         .sports-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .sports-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing: -0.2px; }
-        .sports-pill { padding: 4px 10px; border-radius: 100px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(59, 130, 246, 0.15); background: rgba(59, 130, 246, 0.06); color: var(--accent-blue); }
+        .sports-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .sports-pill { padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(96, 165, 250, 0.2); background: rgba(96, 165, 250, 0.08); color: var(--accent-blue); }
 
-        /* Sun Tracker */
+        /* Sun Tracker Arc Layout */
         .sun-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 20px; }
         .sun-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .sun-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -176,7 +171,7 @@
         .sun-stat-value { font-family: 'Space Grotesk', monospace; font-size: 18px; font-weight: 700; }
         .sun-stat-value.gold { color: var(--accent-amber); }
 
-        /* Bottom Bar */
+        /* System Action Bar */
         .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 24px; padding-bottom: max(12px, env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg-base) 70%, transparent); display: flex; justify-content: center; align-items: center; gap: 20px; z-index: 1000; }
         .countdown-text { font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 600; color: var(--text-muted); min-width: 40px; text-align: center; }
         .refresh-btn { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 32px -8px rgba(96, 165, 250, 0.5); transition: transform 0.2s, box-shadow 0.2s; }
@@ -184,11 +179,9 @@
         .refresh-btn.spinning svg { animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Loading/Error */
         .loading-state { text-align: center; padding: 60px 20px; }
         .loading-spinner { width: 48px; height: 48px; border: 3px solid var(--bg-elevated); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
         .loading-text { font-size: 14px; color: var(--text-secondary); }
-        .error-state { padding: 24px; background: rgba(251, 113, 133, 0.08); border: 1px solid rgba(251, 113, 133, 0.15); border-radius: var(--radius-md); text-align: center; font-size: 14px; color: var(--text-secondary); }
     </style>
 </head>
 <body>
@@ -218,7 +211,7 @@
 
         <div class="sports-card" id="cubsCard" style="display: none;">
             <div class="sports-header">
-                <span class="sports-title">🐻 Chicago Cubs Tracker</span>
+                <span class="sun-title">🐻 Chicago Cubs Tracker</span>
                 <span class="sports-pill">MLB</span>
             </div>
             <div class="sun-stats-row" style="grid-template-columns: 1fr; gap: 10px;">
@@ -282,120 +275,51 @@
         let countdown = 60;
         let sunData = null;
 
-        function calculateComfortIndex(data) {
-            if (!data) return { score: 0, label: 'Unknown', desc: 'No data available', color: '#666', tags: [] };
-
-            const temp = data.imperial?.temp;
-            const humidity = data.humidity;
-            const dewpt = data.imperial?.dewpt;
-            const windSpeed = data.imperial?.windSpeed ?? 0;
-            const windGust = data.imperial?.windGust ?? 0;
-            const windChill = data.imperial?.windChill;
-            const heatIndex = data.imperial?.heatIndex;
-            const uv = data.uv ?? 0;
-            const precipRate = data.imperial?.precipRate ?? 0;
-
-            if (temp == null) return { score: 0, label: 'Unknown', desc: 'Temperature unavailable', color: '#666', tags: [] };
+        function calculateComfortIndex(temp, dewpt, windSpeed, windGust, uv, precipRate) {
+            if (temp === null) return { score: 0, label: 'Unknown', desc: 'Temperature metrics down', color: '#666', tags: [] };
 
             let effective = temp;
-            if (temp <= 50 && windSpeed > 3 && windChill != null) effective = windChill;
-            else if (temp >= 80 && heatIndex != null) effective = heatIndex;
-
             let score = 100;
             let tags = [];
 
-            if (effective <= -10) { score -= 90; tags.push('☠️ Extreme danger'); }
-            else if (effective <= 0) { score -= 80; tags.push('🥶 Dangerous cold'); }
-            else if (effective <= 10) { score -= 70; tags.push('🥶 Severe cold'); }
-            else if (effective <= 20) { score -= 60; tags.push('🥶 Bitter cold'); }
-            else if (effective <= 32) { score -= 50; tags.push('❄️ Freezing'); }
-            else if (effective <= 40) { score -= 40; tags.push('🧊 Very cold'); }
-            else if (effective <= 45) { score -= 32; tags.push('Cold'); }
+            if (effective <= 32) { score -= 50; tags.push('❄️ Freezing'); }
             else if (effective <= 50) { score -= 25; tags.push('Chilly'); }
-            else if (effective <= 55) { score -= 18; tags.push('Cool'); }
             else if (effective <= 60) { score -= 10; tags.push('Mild'); }
-            else if (effective <= 65) { score -= 4; }
             else if (effective <= 75) { score += 5; tags.push('👌 Ideal'); }
-            else if (effective <= 80) { score -= 5; tags.push('Warm'); }
-            else if (effective <= 85) { score -= 15; tags.push('🌡️ Hot'); }
-            else if (effective <= 90) { score -= 28; tags.push('🔥 Very hot'); }
-            else if (effective <= 95) { score -= 42; tags.push('🔥 Extreme heat'); }
-            else if (effective <= 100) { score -= 58; tags.push('☠️ Dangerous heat'); }
-            else if (effective <= 110) { score -= 75; tags.push('☠️ Deadly heat'); }
-            else { score -= 90; tags.push('☠️ Unsurvivable'); }
+            else if (effective <= 85) { score -= 15; tags.push('Warm'); }
+            else if (effective <= 95) { score -= 42; tags.push('🔥 Hot'); }
+            else { score -= 65; tags.push('🥵 Extreme Heat'); }
 
-            if (dewpt != null && effective > 55) {
-                if (dewpt >= 75) { score -= 28; tags.push('💦 Oppressive'); }
-                else if (dewpt >= 70) { score -= 20; tags.push('💦 Very humid'); }
+            if (dewpt !== null && effective > 55) {
+                if (dewpt >= 72) { score -= 25; tags.push('💦 Sticky'); }
                 else if (dewpt >= 65) { score -= 14; tags.push('💧 Humid'); }
-                else if (dewpt >= 60) { score -= 8; tags.push('Sticky'); }
-                else if (dewpt >= 55) { score -= 3; }
-                if (dewpt <= 20 && effective < 45) { score -= 5; tags.push('Very dry air'); }
             }
 
-            if (windSpeed > 40 || windGust > 50) { score -= 30; tags.push('💨 Dangerous winds'); }
-            else if (windSpeed > 30 || windGust > 40) { score -= 22; tags.push('💨 Very windy'); }
-            else if (windSpeed > 20 || windGust > 30) { score -= 15; if (effective < 50) tags.push('💨 Cold & windy'); else tags.push('💨 Windy'); }
-            else if (windSpeed > 15) {
-                if (effective < 45) { score -= 12; tags.push('Biting wind'); }
-                else if (effective > 82) { score += 3; tags.push('🍃 Cooling breeze'); }
-                else { score -= 5; tags.push('Breezy'); }
-            }
-            else if (windSpeed >= 5 && windSpeed <= 15 && effective >= 72 && effective <= 90) {
-                score += 5; tags.push('🍃 Nice breeze');
-            }
-
-            if (uv >= 11) { score -= 18; tags.push('☀️ Extreme UV'); }
-            else if (uv >= 8) { score -= 12; tags.push('☀️ Very high UV'); }
-            else if (uv >= 6) { score -= 6; tags.push('High UV'); }
-            else if (uv >= 3) { score -= 2; }
-
-            if (precipRate > 0.5) { score -= 35; tags.push('⛈️ Heavy rain'); }
-            else if (precipRate > 0.2) { score -= 25; tags.push('🌧️ Rain'); }
-            else if (precipRate > 0.05) { score -= 15; tags.push('🌦️ Light rain'); }
-            else if (precipRate > 0) { score -= 10; tags.push('💧 Drizzle'); }
+            if (windSpeed > 25) { score -= 15; tags.push('💨 Windy'); }
+            if (uv >= 7) { score -= 10; tags.push('☀️ High UV'); }
+            if (precipRate > 0.05) { score -= 20; tags.push('🌧️ Rain'); }
 
             score = Math.max(0, Math.min(100, Math.round(score)));
 
             let label, desc, color;
-            if (score >= 90) { label = 'Perfect'; desc = 'Ideal conditions — get outside and enjoy!'; color = '#10b981'; }
-            else if (score >= 80) { label = 'Excellent'; desc = 'Great day to be outside'; color = '#34d399'; }
-            else if (score >= 70) { label = 'Good'; desc = 'Pleasant conditions overall'; color = '#84cc16'; }
-            else if (score >= 64) { label = 'Fair'; desc = 'Decent but plan accordingly'; color = '#eab308'; }
-            else if (score >= 50) { label = 'Moderate'; desc = 'Dress appropriately for active parameters'; color = '#f59e0b'; }
-            else if (score >= 36) { label = 'Poor'; desc = 'Less than comfortable ambient elements'; color = '#f97316'; }
-            else if (score >= 22) { label = 'Bad'; desc = 'Uncomfortable ambient environment'; color = '#ef4444'; }
-            else if (score >= 10) { label = 'Harsh'; desc = 'Limit prolonged time outdoors'; color = '#dc2626'; }
-            else { label = 'Dangerous'; desc = 'Hazardous environmental conditions active'; color = '#991b1b'; }
+            if (score >= 88) { label = 'Perfect'; desc = 'Exceptional outdoor conditions.'; color = '#34d399'; }
+            else if (score >= 74) { label = 'Good'; desc = 'Pleasant baseline variables.'; color = '#84cc16'; }
+            else if (score >= 50) { label = 'Moderate'; desc = 'Passable balance. Dress accordingly.'; color = '#f59e0b'; }
+            else { label = 'Poor'; desc = 'Uncomfortable ambient environment.'; color = '#fb7185'; }
 
-            return { score, label, desc, color, tags: tags.slice(0, 3), effective };
+            return { score, label, desc, color, tags: tags.slice(0, 3) };
         }
 
-        function getWeatherCondition(data) {
-            if (!data) return { icon: '❓', text: 'Unknown' };
-            const temp = data.imperial?.temp;
-            const humidity = data.humidity ?? 0;
-            const wind = data.imperial?.windSpeed ?? 0;
-            const precip = data.imperial?.precipRate ?? 0;
-            const solar = data.solarRadiation ?? 0;
-            const uv = data.uv ?? 0;
+        function getWeatherCondition(temp, humidity, wind, precip, solar, uv) {
             const hour = new Date().getHours();
             const isNight = hour < 6 || hour >= 21;
 
-            if (temp != null && temp <= 35 && precip > 0) return { icon: '❄️', text: 'Snow' };
-            if (precip > 0.3) return { icon: '⛈️', text: 'Heavy Rain' };
-            if (precip > 0.1) return { icon: '🌧️', text: 'Rain' };
-            if (precip > 0) return { icon: '🌦️', text: 'Light Rain' };
-            if (humidity > 92 && temp != null && temp < 55) return { icon: '🌫️', text: 'Fog' };
-            if (temp != null && temp <= 20) return { icon: '🥶', text: 'Frigid' };
-            if (temp != null && temp <= 32) return { icon: '❄️', text: 'Freezing' };
-            if (temp != null && temp >= 100) return { icon: '🔥', text: 'Extreme Heat' };
-            if (temp != null && temp >= 90) return { icon: '☀️', text: 'Hot' };
-            if (wind > 25) return { icon: '💨', text: 'Windy' };
-            if (isNight) { return humidity < 70 ? { icon: '🌙', text: 'Clear Night' } : { icon: '☁️', text: 'Cloudy Night' }; }
-            if (solar > 600 || uv > 5) return { icon: '☀️', text: 'Sunny' };
-            if (solar > 300 || uv > 2) return { icon: '🌤️', text: 'Mostly Sunny' };
-            if (solar > 100) return { icon: '⛅', text: 'Partly Cloudy' };
+            if (precip > 0.2) return { icon: '⛈️', text: 'Heavy Rain' };
+            if (precip > 0) return { icon: '🌧️', text: 'Rain' };
+            if (temp !== null && temp <= 32) return { icon: '❄️', text: 'Freezing' };
+            if (temp !== null && temp >= 90) return { icon: '☀️', text: 'Hot' };
+            if (isNight) return { icon: '🌙', text: 'Clear Night' };
+            if (solar > 400 || uv > 4) return { icon: '☀️', text: 'Sunny' };
             return { icon: '☁️', text: 'Cloudy' };
         }
 
@@ -442,26 +366,22 @@
             const daylightEl = document.getElementById('daylightLeft');
             const pill = document.getElementById('goldenPill');
 
-            if (now < sunrise) { daylightEl.textContent = 'Pre-dawn'; sunMarker.textContent = '🌙'; pill.className = 'golden-pill inactive'; pill.textContent = 'Golden Hour'; }
-            else if (now > sunset) { daylightEl.textContent = 'Night'; sunMarker.textContent = '🌙'; pill.className = 'golden-pill inactive'; pill.textContent = 'Golden Hour'; }
-            else {
+            if (now < sunrise || now > sunset) {
+                daylightEl.textContent = 'Night';
+                sunMarker.textContent = '🌙';
+                pill.className = 'golden-pill inactive';
+                pill.textContent = 'Golden Hour';
+            } else {
                 const h = Math.floor(remaining / 3600000);
                 const m = Math.floor((remaining % 3600000) / 60000);
                 daylightEl.textContent = `${h}h ${m}m`;
                 sunMarker.textContent = '☀️';
-
                 if (now >= goldenStart) {
-                    const left = Math.floor((sunset - now) / 60000);
                     pill.className = 'golden-pill active';
-                    pill.textContent = `🎬 ${left}m left!`;
+                    pill.textContent = `🎬 Active`;
                 } else {
-                    const until = Math.floor((goldenStart - now) / 60000);
-                    if (until <= 120) {
-                        const uh = Math.floor(until / 60);
-                        const um = until % 60;
-                        pill.className = 'golden-pill soon';
-                        pill.textContent = uh > 0 ? `In ${uh}h ${um}m` : `In ${um}m`;
-                    } else { pill.className = 'golden-pill inactive'; pill.textContent = 'Golden Hour'; }
+                    pill.className = 'golden-pill inactive';
+                    pill.textContent = 'Golden Hour';
                 }
             }
         }
@@ -469,138 +389,101 @@
         async function fetchCubsData() {
             try {
                 const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/chc');
-                if (!res.ok) throw new Error('Cubs endpoint gateway error');
+                if (!res.ok) throw new Error('Network error');
                 const json = await res.json();
                 const team = json.team;
                 if (!team) return;
 
-                if (team.nextEvent && team.nextEvent.length > 0) {
+                if (team.nextEvent?.[0]) {
                     const next = team.nextEvent[0];
                     const gameDate = new Date(next.date);
-                    
                     const numericDate = gameDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
                     const writtenDay = gameDate.toLocaleDateString('en-US', { weekday: 'long' });
                     const numericYear = gameDate.getFullYear();
-                    
                     const timeStr = gameDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-                    const shortName = next.shortName ? ` (${next.shortName})` : '';
-
-                    document.getElementById('cubsNextGame').innerHTML = `<strong>${numericDate}</strong>, ${writtenDay} <strong>${numericYear}</strong> @ ${timeStr}${shortName}`;
-                } else {
-                    document.getElementById('cubsNextGame').textContent = 'No upcoming games scheduled';
+                    document.getElementById('cubsNextGame').innerHTML = `<strong>${numericDate}</strong>, ${writtenDay} <strong>${numericYear}</strong> @ ${timeStr}`;
                 }
 
-                const last = team.lastEvent ? (Array.isArray(team.lastEvent) ? team.lastEvent[0] : team.lastEvent) : null;
-                if (last && last.competitions && last.competitions[0]) {
-                    const comp = last.competitions[0];
-                    const competitors = comp.competitors || [];
-                    
-                    let cubsScore = null;
-                    let oppScore = null;
-                    let oppName = '';
-
-                    competitors.forEach(teamObj => {
-                        const isCubs = teamObj.team?.abbreviation === 'CHC' || teamObj.team?.id === '16';
-                        const scoreStr = teamObj.score?.displayValue || teamObj.score || '0';
-                        if (isCubs) {
-                            cubsScore = parseInt(scoreStr);
-                        } else {
-                            oppScore = parseInt(scoreStr);
-                            oppName = teamObj.team?.abbreviation || teamObj.team?.shortDisplayName || 'OPP';
-                        }
+                const last = team.lastEvent?.[0] || team.lastEvent;
+                if (last?.competitions?.[0]) {
+                    const competitors = last.competitions[0].competitors || [];
+                    let chcScore, oppScore, oppAbbr = 'OPP';
+                    competitors.forEach(t => {
+                        if (t.team?.abbreviation === 'CHC') chcScore = t.score?.displayValue || t.score;
+                        else { oppScore = t.score?.displayValue || t.score; oppAbbr = t.team?.abbreviation || 'OPP'; }
                     });
-
-                    if (cubsScore !== null && oppScore !== null) {
-                        const winLossMark = cubsScore > oppScore ? '🟢 W' : (cubsScore < oppScore ? '🔴 L' : '⚪ T');
-                        document.getElementById('cubsPrevGame').textContent = `CHC ${cubsScore} - ${oppScore} ${oppName} (${winLossMark})`;
-                    } else {
-                        document.getElementById('cubsPrevGame').textContent = 'Score calculations incomplete';
+                    if (chcScore !== undefined && oppScore !== undefined) {
+                        const mark = parseInt(chcScore) > parseInt(oppScore) ? '🟢 W' : '🔴 L';
+                        document.getElementById('cubsPrevGame').textContent = `CHC ${chcScore} - ${oppScore} ${oppAbbr} (${mark})`;
                     }
-                } else {
-                    document.getElementById('cubsPrevGame').textContent = 'Historical scoreboard log empty';
                 }
-
                 document.getElementById('cubsCard').style.display = 'block';
-            } catch (err) {
-                console.warn('Cubs error:', err);
-            }
+            } catch (e) { console.warn('Cubs stream unavailable'); }
         }
 
         async function fetchStation(stationId) {
-            const url = `https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=e&apiKey=${API_KEY}`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const json = await res.json();
-            return json.observations?.[0] || null;
+            try {
+                const url = `https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=e&apiKey=${API_KEY}`;
+                const res = await fetch(url);
+                if (res.status === 204) return null; // Stale/Offline station hook
+                if (!res.ok) return null;
+                const json = await res.json();
+                return json.observations?.[0] || null;
+            } catch (e) { return null; }
         }
 
         async function fetchForecast(lat, lon) {
-            const url = `https://api.weather.com/v3/wx/forecast/daily/5day?geocode=${lat},${lon}&format=json&units=e&language=en-US&apiKey=${API_KEY}`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return await res.json();
+            try {
+                const url = `https://api.weather.com/v3/wx/forecast/daily/5day?geocode=${lat},${lon}&format=json&units=e&language=en-US&apiKey=${API_KEY}`;
+                const res = await fetch(url);
+                return res.ok ? await res.json() : null;
+            } catch (e) { return null; }
         }
 
         function renderStation(config, data, forecast) {
-            if (!data) {
-                return `<div class="station"><div class="station-header"><div><div class="station-name">${config.name}</div><div class="station-location">${config.location}</div></div><span class="station-status offline">● Offline</span></div><div class="error-state" style="margin: 20px;">Station data temporarily unavailable</div></div>`;
+            if (!data || !data.imperial) {
+                return `<div class="station"><div class="station-header"><div><div class="station-name">${config.name}</div><div class="station-location">${config.location}</div></div><span class="station-status offline">● Unreachable</span></div><div class="error-state" style="margin: 20px;">Weather Underground sync pending. Check station credentials.</div></div>`;
             }
 
-            const getValidNum = (val) => (typeof val === 'number' && !isNaN(val)) ? val : null;
+            // PURE TYPE SAFETY EXTRACTION HOOKS (Ensures no automatic conversions to 0)
+            const checkNum = (val) => (typeof val === 'number' && !isNaN(val)) ? val : null;
 
-            const temp = getValidNum(data.imperial?.temp);
-            const humidity = getValidNum(data.humidity);
-            const dewpt = getValidNum(data.imperial?.dewpt);
-            const windSpeed = getValidNum(data.imperial?.windSpeed) ?? 0;
-            const windDir = getValidNum(data.winddir) ?? 0;
-            const windGust = getValidNum(data.imperial?.windGust) ?? 0;
-            const pressure = getValidNum(data.imperial?.pressure);
-            const precipTotal = getValidNum(data.imperial?.precipTotal) ?? 0;
-            const uv = getValidNum(data.uv) ?? 0;
-            const solar = getValidNum(data.solarRadiation) ?? 0;
+            const temp = checkNum(data.imperial.temp);
+            const humidity = checkNum(data.humidity);
+            const dewpt = checkNum(data.imperial.dewpt);
+            const windSpeed = checkNum(data.imperial.windSpeed) ?? 0;
+            const windDir = checkNum(data.winddir) ?? 0;
+            const windGust = checkNum(data.imperial.windGust) ?? 0;
+            const pressure = checkNum(data.imperial.pressure);
+            const precipTotal = checkNum(data.imperial.precipTotal) ?? 0;
+            const uv = checkNum(data.uv) ?? 0;
+            const solar = checkNum(data.solarRadiation) ?? 0;
 
-            let lightningCount = 0;
-            if (data.lightning != null) {
-                if (typeof data.lightning === 'number') lightningCount = data.lightning;
-                else if (typeof data.lightning === 'object' && typeof data.lightning.count === 'number') lightningCount = data.lightning.count;
-            } else if (typeof data.lightningDay === 'number') lightningCount = data.lightningDay;
-            else if (typeof data.lightning_day === 'number') lightningCount = data.lightning_day;
-            else if (typeof data.lightningStrikeCount === 'number') lightningCount = data.lightningStrikeCount;
-            else if (data.imperial && typeof data.imperial.lightningCount === 'number') lightningCount = data.imperial.lightningCount;
-
-            let feelsLike = temp;
-            const windChill = getValidNum(data.imperial?.windChill);
-            const heatIndex = getValidNum(data.imperial?.heatIndex);
-            if (temp !== null) {
-                if (temp <= 50 && windSpeed > 3 && windChill !== null) feelsLike = windChill;
-                else if (temp >= 80 && heatIndex !== null) feelsLike = heatIndex;
-            }
+            let lightningCount = checkNum(data.lightning) ?? checkNum(data.lightningStrikeCount) ?? checkNum(data.lightning_day) ?? 0;
 
             const tempDisplay = (temp !== null) ? `${Math.round(temp)}` : '--';
-            const feelsLikeDisplay = (feelsLike !== null) ? `${Math.round(feelsLike)}` : '--';
+            const feelsLikeDisplay = (temp !== null) ? `${Math.round(data.imperial.heatIndex || data.imperial.windChill || temp)}` : '--';
             const humidityDisplay = (humidity !== null) ? `${humidity}` : '--';
             const dewptDisplay = (dewpt !== null) ? `${Math.round(dewpt)}` : '--';
             const pressureDisplay = (pressure !== null) ? pressure.toFixed(2) : '--';
-            const precipDisplay = precipTotal.toFixed(2);
 
             const windDirAbbr = getWindDir(windDir);
             const windDirFull = getFullWindDir(windDirAbbr);
-            const condition = getWeatherCondition(data);
-            const comfort = calculateComfortIndex(data);
+            const condition = getWeatherCondition(temp, humidity, windSpeed, precipTotal, solar, uv);
+            const comfort = calculateComfortIndex(temp, dewpt, windSpeed, windGust, uv, precipTotal);
 
             const circumference = 2 * Math.PI * 72;
-            const offset = circumference - ((comfort.score || 0) / 100) * circumference;
+            const offset = circumference - (comfort.score / 100) * circumference;
 
             let forecastHtml = '';
             if (forecast?.daypart?.[0]) {
                 const dp = forecast.daypart[0];
                 let startIdx = dp.temperature?.[0] === null ? 1 : 0;
                 for (let i = startIdx; i < Math.min(startIdx + 3, dp.daypartName?.length ?? 0); i++) {
-                    if (dp.temperature?.[i] === null) continue;
-                    forecastHtml += `<div class="forecast-item"><div class="forecast-period">${dp.daypartName[i]}</div><div class="forecast-narrative">${dp.narrative?.[i] || 'Forecast narrative unavailable'}</div></div>`;
+                    forecastHtml += `<div class="forecast-item"><div class="forecast-period">${dp.daypartName[i]}</div><div class="forecast-narrative">${dp.narrative?.[i] || 'Unavailable'}</div></div>`;
                 }
             }
-            if (!forecastHtml) forecastHtml = '<div class="forecast-item"><div class="forecast-narrative">Extended outlook unavailable</div></div>';
+            if (!forecastHtml) forecastHtml = '<div class="forecast-item"><div class="forecast-narrative">Extended data unavailable</div></div>';
 
             const uid = config.id;
 
@@ -608,7 +491,7 @@
                 <div class="data-cell"><div class="data-icon">💧</div><div class="data-label">Humidity</div><div class="data-value">${humidityDisplay}<span class="unit">%</span></div></div>
                 <div class="data-cell"><div class="data-icon">🌡️</div><div class="data-label">Dew Point</div><div class="data-value">${dewptDisplay}<span class="unit">°</span></div></div>
                 <div class="data-cell"><div class="data-icon">📊</div><div class="data-label">Pressure</div><div class="data-value">${pressureDisplay}<span class="unit">"</span></div></div>
-                <div class="data-cell"><div class="data-icon">🌧️</div><div class="data-label">Rain Today</div><div class="data-value">${precipDisplay}<span class="unit">"</span></div></div>`;
+                <div class="data-cell"><div class="data-icon">🌧️</div><div class="data-label">Rain Today</div><div class="data-value">${precipTotal.toFixed(2)}<span class="unit">"</span></div></div>`;
 
             if (config.hasSolar) {
                 dataCells += `<div class="data-cell"><div class="data-icon">☀️</div><div class="data-label">UV Index</div><div class="data-value">${uv}</div></div>`;
@@ -630,7 +513,6 @@
             return `
                 <div class="station">
                     <div class="station-header"><div><div class="station-name">${config.name}</div><div class="station-location">${config.location}</div></div><span class="station-status">● Live</span></div>
-                    
                     <div class="comfort-section">
                         <div class="comfort-ring-wrap">
                             <svg class="comfort-ring-svg" viewBox="0 0 160 160">
@@ -645,15 +527,13 @@
                         <div class="comfort-desc">${comfort.desc}</div>
                         ${comfort.tags.length > 0 ? `<div class="comfort-tags">${comfort.tags.map(t => `<span class="comfort-tag">${t}</span>`).join('')}</div>` : ''}
                     </div>
-
                     <div class="temp-section">
                         <div class="temp-main">
                             <div class="temp-value">${tempDisplay}<span class="deg">°F</span></div>
-                            ${temp !== null && Math.round(feelsLike) !== Math.round(temp) ? `<div class="temp-feels">Feels like <strong>${feelsLikeDisplay}°</strong></div>` : ''}
+                            ${tempDisplay !== feelsLikeDisplay ? `<div class="temp-feels">Feels like <strong>${feelsLikeDisplay}°</strong></div>` : ''}
                         </div>
                         <div class="condition-chip"><div class="condition-icon">${condition.icon}</div><div class="condition-text">${condition.text}</div></div>
                     </div>
-
                     <div class="wind-section">
                         <div class="compass-container">
                             <div class="compass-ring"></div>
@@ -667,10 +547,8 @@
                             ${windGust > windSpeed ? `<div class="wind-gust-alert">⚠️ Gusts to ${Math.round(windGust)} mph</div>` : ''}
                         </div>
                     </div>
-
                     <div class="data-grid">${dataCells}</div>
                     ${lightningHtml}
-                    
                     <button class="forecast-toggle" onclick="toggleForecast('${uid}')" id="btn-${uid}">
                         📋 Extended Outlook
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>
@@ -684,60 +562,32 @@
             document.getElementById(`btn-${id}`).classList.toggle('open');
         }
 
-        // FULL PARALLEL TELEMETRY ENGINE Optimization
+        // Snap Async Request Engine
         async function refresh() {
             const btn = document.getElementById('refreshBtn');
             const content = document.getElementById('content');
             btn.classList.add('spinning');
 
-            // Fire off sports data out-of-band (non-blocking)
             fetchCubsData();
 
-            // Run station fetches in true parallel using mapped async contexts
             const stationPromises = STATIONS.map(async (station) => {
-                let data = null;
+                const data = await fetchStation(station.id);
                 let forecast = null;
 
-                try {
-                    data = await fetchStation(station.id);
-                } catch (err) {
-                    console.error(`Network gateway failed for ${station.id}:`, err);
+                if (data?.lat && data?.lon) {
+                    forecast = await fetchForecast(data.lat, data.lon);
+                    if (!sunData && forecast) {
+                        sunData = { sunrise: forecast.sunriseTimeLocal?.[0], sunset: forecast.sunsetTimeLocal?.[0] };
+                        setTimeout(() => {
+                            document.getElementById('sunCard').style.display = 'block';
+                            updateSunTracker();
+                        }, 0);
+                    }
                 }
-
-                if (data && data.lat && data.lon) {
-                    try {
-                        forecast = await fetchForecast(data.lat, data.lon);
-                        if (!sunData && forecast) {
-                            sunData = { sunrise: forecast.sunriseTimeLocal?.[0], sunset: forecast.sunsetTimeLocal?.[0] };
-                            setTimeout(() => {
-                                document.getElementById('sunCard').style.display = 'block';
-                                updateSunTracker();
-                            }, 0);
-                        }
-                    } catch (e) { console.warn('Forecast unavailable:', e); }
-                }
-
-                try {
-                    return renderStation(station, data, forecast);
-                } catch (renderError) {
-                    console.error(`Layout generation runtime exception on ${station.id}:`, renderError);
-                    return `<div class="station">
-                        <div class="station-header">
-                            <div>
-                                <div class="station-name">${station.name}</div>
-                                <div class="station-location">${station.location}</div>
-                            </div>
-                            <span class="station-status offline">● Error</span>
-                        </div>
-                        <div class="error-state" style="margin: 20px;">Telemetry parsing anomaly. Re-establishing telemetry pipeline...</div>
-                    </div>`;
-                }
+                return renderStation(station, data, forecast);
             });
 
-            // Await synchronization barrier across all threads simultaneously
             const htmlCards = await Promise.all(stationPromises);
-            
-            // Push layout nodes straight to screen at the same instant
             content.innerHTML = htmlCards.join('');
             
             countdown = 60;
@@ -756,9 +606,6 @@
             refresh(); 
             setInterval(tick, 1000); 
         });
-        
-        if ('wakeLock' in navigator) navigator.wakeLock.request('screen').catch(() => {});
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
     </script>
 </body>
 </html>
