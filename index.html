@@ -91,7 +91,7 @@
         .station-loading { padding: 40px 20px; text-align: center; color: var(--text-secondary); }
 
         /* Comfort ring */
-        .comfort-section { padding: 24px 20px 20px; text-align: center; }
+        .comfort-section { padding: 8px 20px 24px; text-align: center; }
         .comfort-ring-wrap { position: relative; width: 180px; height: 180px; margin: 0 auto 20px; }
         .comfort-ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
         .comfort-ring-bg { fill: none; stroke: var(--bg-elevated); stroke-width: 14; }
@@ -104,7 +104,7 @@
         .comfort-tag { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: var(--bg-elevated); border-radius: 100px; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
 
         /* Temperature */
-        .temp-section { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 0 20px 24px; }
+        .temp-section { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 28px 20px 16px; }
         .temp-main { text-align: center; }
         .temp-value { font-family: 'Space Grotesk', monospace; font-size: 80px; font-weight: 700; line-height: 0.9; letter-spacing: -4px; }
         .temp-value .deg { font-size: 32px; font-weight: 500; opacity: 0.5; vertical-align: top; margin-left: -8px; }
@@ -740,6 +740,16 @@
                 </div>
                 <span class="station-status offline" data-field="status">● Offline</span>
             </div>
+            <div class="temp-section">
+                <div class="temp-main">
+                    <div class="temp-value"><span data-field="temp">--</span><span class="deg">°F</span></div>
+                    <div class="temp-feels" data-field="feelsLike"></div>
+                </div>
+                <div class="condition-chip">
+                    <div class="condition-icon" data-field="conditionIcon" aria-hidden="true">☁️</div>
+                    <div class="condition-text" data-field="conditionText">--</div>
+                </div>
+            </div>
             <div class="comfort-section">
                 <div class="comfort-ring-wrap">
                     <svg class="comfort-ring-svg" viewBox="0 0 160 160" aria-hidden="true">
@@ -754,16 +764,6 @@
                 </div>
                 <div class="comfort-desc" data-field="comfortDesc">Awaiting hardware sync...</div>
                 <div class="comfort-tags" data-field="comfortTags"></div>
-            </div>
-            <div class="temp-section">
-                <div class="temp-main">
-                    <div class="temp-value"><span data-field="temp">--</span><span class="deg">°F</span></div>
-                    <div class="temp-feels" data-field="feelsLike"></div>
-                </div>
-                <div class="condition-chip">
-                    <div class="condition-icon" data-field="conditionIcon" aria-hidden="true">☁️</div>
-                    <div class="condition-text" data-field="conditionText">--</div>
-                </div>
             </div>
             <div class="wind-section">
                 <div class="compass-container" aria-hidden="true">
