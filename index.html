@@ -25,25 +25,25 @@
     
     <style>
         :root {
-            --bg-base: #06090f;
-            --bg-card: #0d131f;
-            --bg-elevated: #141b29;
-            --border-subtle: rgba(255,255,255,0.04);
-            --border-medium: rgba(255,255,255,0.08);
+            --bg-base: #080c14;
+            --bg-card: #0f1521;
+            --bg-elevated: #161d2d;
+            --border-subtle: rgba(255,255,255,0.06);
+            --border-medium: rgba(255,255,255,0.1);
             --text-primary: #f8fafc;
-            --text-secondary: rgba(248,250,252,0.65);
-            --text-muted: rgba(248,250,252,0.35);
+            --text-secondary: rgba(248,250,252,0.7);
+            --text-muted: rgba(248,250,252,0.4);
             --accent-cyan: #22d3ee;
-            --accent-emerald: #10b981;
-            --accent-amber: #f59e0b;
-            --accent-orange: #f97316;
-            --accent-rose: #f43f5e;
+            --accent-emerald: #34d399;
+            --accent-amber: #fbbf24;
+            --accent-orange: #fb923c;
+            --accent-rose: #fb7185;
             --accent-purple: #a78bfa;
-            --accent-blue: #3b82f6;
+            --accent-blue: #60a5fa;
             --radius-sm: 12px;
             --radius-md: 16px;
             --radius-lg: 24px;
-            --radius-xl: 28px;
+            --radius-xl: 32px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -55,144 +55,140 @@
             min-height: 100%;
             padding: 16px;
             padding-top: max(16px, env(safe-area-inset-top));
-            padding-bottom: max(100px, calc(env(safe-area-inset-bottom) + 100px));
-            line-height: 1.4;
+            padding-bottom: max(90px, calc(env(safe-area-inset-bottom) + 90px));
+            line-height: 1.5;
         }
-        .container { max-width: 440px; margin: 0 auto; }
+        .container { max-width: 480px; margin: 0 auto; }
 
         /* Header */
-        .header { text-align: center; padding: 12px 0 28px; }
-        .clock { margin-bottom: 20px; }
-        .clock-day { font-size: 10px; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
-        .clock-time { font-family: 'Space Grotesk', monospace; font-size: 52px; font-weight: 700; letter-spacing: -2.5px; background: linear-gradient(180deg, var(--text-primary) 30%, rgba(248,250,252,0.4) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .clock-date { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-top: 4px; letter-spacing: -0.2px; }
-        .brand { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 100px; }
-        .brand-icon { font-size: 16px; }
-        .brand-text { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: -0.2px; color: var(--text-secondary); }
-        .status-live { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 10px; font-weight: 700; color: var(--accent-emerald); text-transform: uppercase; letter-spacing: 1.5px; }
-        .status-dot { width: 5px; height: 5px; background: var(--accent-emerald); border-radius: 50%; box-shadow: 0 0 8px var(--accent-emerald); animation: pulse 2s ease-in-out infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .header { text-align: center; padding: 8px 0 24px; }
+        .clock { margin-bottom: 16px; }
+        .clock-day { font-size: 11px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+        .clock-time { font-family: 'Space Grotesk', monospace; font-size: 48px; font-weight: 700; letter-spacing: -2px; background: linear-gradient(180deg, var(--text-primary) 0%, rgba(248,250,252,0.6) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .clock-date { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
+        .brand { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 100px; }
+        .brand-icon { font-size: 20px; }
+        .brand-text { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: -0.3px; }
+        .status-live { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 11px; font-weight: 600; color: var(--accent-emerald); text-transform: uppercase; letter-spacing: 1px; }
+        .status-dot { width: 6px; height: 6px; background: var(--accent-emerald); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
         /* Station Card */
-        .station { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); margin-bottom: 24px; overflow: hidden; box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5); }
-        .station-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 24px 24px 0; }
-        .station-name { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 3px; }
-        .station-location { font-size: 12px; font-weight: 500; color: var(--text-muted); }
-        .station-status { display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 100px; font-size: 9px; font-weight: 700; color: var(--accent-emerald); text-transform: uppercase; letter-spacing: 0.5px; }
-        .station-status.offline { background: rgba(244, 63, 94, 0.08); border-color: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .station { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); margin-bottom: 20px; overflow: hidden; }
+        .station-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 20px 0; }
+        .station-name { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px; }
+        .station-location { font-size: 12px; color: var(--text-muted); }
+        .station-status { display: flex; align-items: center; gap: 5px; padding: 5px 10px; background: rgba(52, 211, 153, 0.1); border-radius: 100px; font-size: 10px; font-weight: 700; color: var(--accent-emerald); text-transform: uppercase; letter-spacing: 0.5px; }
+        .station-status.offline { background: rgba(251, 113, 133, 0.1); color: var(--accent-rose); }
 
         /* Comfort Score */
-        .comfort-section { padding: 28px 24px 20px; text-align: center; position: relative; }
-        .comfort-ring-wrap { position: relative; width: 160px; height: 160px; margin: 0 auto 18px; }
+        .comfort-section { padding: 24px 20px 20px; text-align: center; }
+        .comfort-ring-wrap { position: relative; width: 180px; height: 180px; margin: 0 auto 20px; }
         .comfort-ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-        .comfort-ring-bg { fill: none; stroke: var(--bg-elevated); stroke-width: 11; }
-        .comfort-ring-fill { fill: none; stroke-width: 11; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease; }
-        .comfort-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
-        .comfort-value { font-family: 'Space Grotesk', monospace; font-size: 54px; font-weight: 700; line-height: 1; letter-spacing: -2px; }
-        .comfort-label { font-size: 13px; font-weight: 700; margin-top: 2px; text-transform: uppercase; letter-spacing: 1.5px; }
-        .comfort-desc { font-size: 14px; color: var(--text-secondary); max-width: 290px; margin: 0 auto 16px; line-height: 1.45; font-weight: 400; }
+        .comfort-ring-bg { fill: none; stroke: var(--bg-elevated); stroke-width: 14; }
+        .comfort-ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease; filter: drop-shadow(0 0 20px currentColor); }
+        .comfort-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .comfort-value { font-family: 'Space Grotesk', monospace; font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -2px; }
+        .comfort-label { font-size: 16px; font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .comfort-desc { font-size: 15px; color: var(--text-secondary); max-width: 300px; margin: 0 auto 16px; line-height: 1.5; }
         .comfort-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
-        .comfort-tag { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 100px; font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+        .comfort-tag { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: var(--bg-elevated); border-radius: 100px; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
 
         /* Temperature */
-        .temp-section { display: flex; align-items: center; justify-content: center; gap: 24px; padding: 0 24px 28px; }
+        .temp-section { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 0 20px 24px; }
         .temp-main { text-align: center; }
-        .temp-value { font-family: 'Space Grotesk', monospace; font-size: 76px; font-weight: 700; line-height: 0.85; letter-spacing: -4px; position: relative; left: 4px; }
-        .temp-value .deg { font-size: 28px; font-weight: 400; opacity: 0.4; vertical-align: top; margin-left: -4px; }
-        .temp-feels { font-size: 13px; color: var(--text-secondary); margin-top: 8px; font-weight: 400; }
+        .temp-value { font-family: 'Space Grotesk', monospace; font-size: 80px; font-weight: 700; line-height: 0.9; letter-spacing: -4px; }
+        .temp-value .deg { font-size: 32px; font-weight: 500; opacity: 0.5; vertical-align: top; margin-left: -8px; }
+        .temp-feels { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
         .temp-feels strong { color: var(--text-primary); font-weight: 600; }
-        .condition-chip { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 18px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); min-width: 96px; }
-        .condition-icon { font-size: 28px; }
-        .condition-text { font-size: 12px; font-weight: 600; color: var(--text-secondary); letter-spacing: -0.1px; }
+        .condition-chip { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 20px; background: var(--bg-elevated); border-radius: var(--radius-md); }
+        .condition-icon { font-size: 32px; }
+        .condition-text { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 
         /* Wind */
-        .wind-section { display: flex; align-items: center; gap: 20px; padding: 0 24px 24px; }
-        .compass-container { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
-        .compass-ring { position: absolute; inset: 0; border: 1px solid var(--border-medium); border-radius: 50%; background: var(--bg-elevated); }
-        .compass-dirs { position: absolute; inset: 6px; font-size: 9px; font-weight: 700; color: var(--text-muted); }
+        .wind-section { display: flex; align-items: center; gap: 20px; padding: 0 20px 20px; }
+        .compass-container { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+        .compass-ring { position: absolute; inset: 0; border: 2px solid var(--border-medium); border-radius: 50%; background: var(--bg-elevated); }
+        .compass-dirs { position: absolute; inset: 8px; font-size: 10px; font-weight: 700; color: var(--text-muted); }
         .compass-dirs span { position: absolute; }
         .compass-dirs .n { top: 2px; left: 50%; transform: translateX(-50%); color: var(--text-primary); }
         .compass-dirs .s { bottom: 2px; left: 50%; transform: translateX(-50%); }
         .compass-dirs .e { right: 2px; top: 50%; transform: translateY(-50%); }
         .compass-dirs .w { left: 2px; top: 50%; transform: translateY(-50%); }
-        .compass-needle { position: absolute; top: 50%; left: 50%; width: 3px; height: 34px; transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .compass-needle::before { content: ''; position: absolute; top: 0; left: -4px; border-left: 5.5px solid transparent; border-right: 5.5px solid transparent; border-bottom: 18px solid var(--accent-cyan); filter: drop-shadow(0 0 6px var(--accent-cyan)); }
-        .compass-center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; background: var(--text-primary); border-radius: 50%; box-shadow: 0 0 0 2px var(--bg-elevated); }
+        .compass-needle { position: absolute; top: 50%; left: 50%; width: 4px; height: 38px; transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .compass-needle::before { content: ''; position: absolute; top: 0; left: -5px; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 22px solid var(--accent-cyan); filter: drop-shadow(0 0 8px var(--accent-cyan)); }
+        .compass-center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--text-primary); border-radius: 50%; box-shadow: 0 0 0 3px var(--bg-elevated); }
         .wind-info { flex: 1; }
-        .wind-speed { font-family: 'Space Grotesk', monospace; font-size: 38px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
-        .wind-speed .unit { font-size: 15px; font-weight: 500; color: var(--text-secondary); margin-left: 2px; }
-        .wind-direction-text { font-size: 13px; color: var(--text-secondary); margin-top: 3px; font-weight: 400; }
-        .wind-gust-alert { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; padding: 4px 10px; background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.15); border-radius: 100px; font-size: 11px; font-weight: 600; color: var(--accent-orange); }
+        .wind-speed { font-family: 'Space Grotesk', monospace; font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
+        .wind-speed .unit { font-size: 16px; font-weight: 500; color: var(--text-secondary); margin-left: 4px; }
+        .wind-direction-text { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+        .wind-gust-alert { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 6px 12px; background: rgba(251, 146, 60, 0.15); border-radius: 100px; font-size: 13px; font-weight: 600; color: var(--accent-orange); }
 
         /* Data Grid */
         .data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border-subtle); border-top: 1px solid var(--border-subtle); }
-        .data-cell { background: var(--bg-card); padding: 16px 10px; text-align: center; }
-        .data-icon { font-size: 18px; margin-bottom: 6px; }
-        .data-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); margin-bottom: 3px; }
-        .data-value { font-family: 'Space Grotesk', monospace; font-size: 19px; font-weight: 700; color: var(--text-primary); }
-        .data-value .unit { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+        .data-cell { background: var(--bg-card); padding: 18px 12px; text-align: center; }
+        .data-icon { font-size: 22px; margin-bottom: 8px; }
+        .data-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
+        .data-value { font-family: 'Space Grotesk', monospace; font-size: 20px; font-weight: 700; }
+        .data-value .unit { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
 
-        /* Lightning Tracking */
-        .lightning-section { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--bg-elevated); border-top: 1px solid var(--border-subtle); position: relative; transition: all 0.3s ease; }
-        .lightning-section.active-strikes { background: linear-gradient(135deg, rgba(167, 139, 250, 0.08) 0%, rgba(139, 92, 246, 0.03) 100%); }
-        .lightning-icon-wrap { width: 44px; height: 44px; background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--text-muted); transition: all 0.3s ease; }
-        .lightning-section.active-strikes .lightning-icon-wrap { background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%); color: #fff; border: none; box-shadow: 0 0 16px rgba(167, 139, 250, 0.4); }
-        .lightning-info h4 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); margin-bottom: 1px; }
-        .lightning-count { font-family: 'Space Grotesk', monospace; font-size: 24px; font-weight: 700; color: var(--text-secondary); }
-        .lightning-section.active-strikes .lightning-count { color: var(--accent-purple); text-shadow: 0 0 10px rgba(167, 139, 250, 0.2); }
-        .lightning-count .period { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-left: 3px; }
+        /* Lightning */
+        .lightning-section { display: flex; align-items: center; gap: 16px; padding: 18px 20px; background: linear-gradient(135deg, rgba(167, 139, 250, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%); border-top: 1px solid var(--border-subtle); }
+        .lightning-icon-wrap { width: 52px; height: 52px; background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 0 30px -8px rgba(167, 139, 250, 0.5); }
+        .lightning-info h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 2px; }
+        .lightning-count { font-family: 'Space Grotesk', monospace; font-size: 28px; font-weight: 700; color: var(--accent-purple); }
+        .lightning-count .period { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-left: 4px; }
 
         /* Forecast */
-        .forecast-toggle { width: 100%; padding: 16px 20px; background: transparent; border: none; border-top: 1px solid var(--border-subtle); color: var(--text-secondary); font-family: inherit; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+        .forecast-toggle { width: 100%; padding: 16px 20px; background: transparent; border: none; border-top: 1px solid var(--border-subtle); color: var(--text-primary); font-family: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: background 0.2s; }
         .forecast-toggle:active { background: var(--bg-elevated); }
-        .forecast-toggle svg { transition: transform 0.3s ease; opacity: 0.6; }
-        .forecast-toggle.open { color: var(--text-primary); background: rgba(255,255,255,0.01); }
-        .forecast-toggle.open svg { transform: rotate(180deg); opacity: 1; }
-        .forecast-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(0,0,0,0.1); }
+        .forecast-toggle svg { transition: transform 0.3s ease; }
+        .forecast-toggle.open svg { transform: rotate(180deg); }
+        .forecast-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
         .forecast-content.open { max-height: 800px; }
-        .forecast-item { padding: 16px 20px; border-top: 1px solid var(--border-subtle); }
-        .forecast-period { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); margin-bottom: 4px; }
-        .forecast-narrative { font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); }
+        .forecast-item { padding: 18px 20px; border-top: 1px solid var(--border-subtle); }
+        .forecast-period { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); margin-bottom: 6px; }
+        .forecast-narrative { font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
 
-        /* Sports Tracker Card styles */
+        /* Sports Card styles */
         .sports-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 24px; box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5); }
         .sports-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .sports-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing: -0.2px; }
         .sports-pill { padding: 4px 10px; border-radius: 100px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(59, 130, 246, 0.15); background: rgba(59, 130, 246, 0.06); color: var(--accent-blue); }
 
         /* Sun Tracker */
-        .sun-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 24px; box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5); }
+        .sun-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 20px; }
         .sun-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .sun-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; letter-spacing: -0.2px; }
-        .golden-pill { padding: 4px 10px; border-radius: 100px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid transparent; }
-        .golden-pill.active { background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.15) 100%); border-color: rgba(251, 191, 36, 0.2); color: var(--accent-amber); animation: goldenGlow 2.5s ease-in-out infinite; }
-        .golden-pill.soon { background: rgba(251, 191, 36, 0.06); border-color: rgba(251, 191, 36, 0.1); color: var(--accent-amber); }
-        .golden-pill.inactive { background: var(--bg-elevated); border-color: var(--border-subtle); color: var(--text-muted); }
-        @keyframes goldenGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } 50% { box-shadow: 0 0 16px 2px rgba(251, 191, 36, 0.12); } }
-        .sun-arc-wrap { position: relative; height: 80px; margin-bottom: 12px; overflow: hidden; }
-        .sun-arc { position: absolute; bottom: 0; left: 6%; width: 88%; height: 140px; border: 1.5px dashed rgba(255,255,255,0.06); border-radius: 50%; }
-        .sun-marker { position: absolute; width: 28px; height: 28px; background: var(--accent-amber); border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 0 20px var(--accent-amber); transition: all 0.5s ease; }
-        .sun-horizon { position: absolute; bottom: 0; left: 2%; width: 96%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent); }
-        .sun-times-row { display: flex; justify-content: space-between; padding: 0 4%; font-size: 11px; font-weight: 500; color: var(--text-muted); margin-bottom: 16px; }
-        .sun-stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .sun-stat { text-align: center; padding: 12px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); }
-        .sun-stat-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 2px; }
-        .sun-stat-value { font-family: 'Space Grotesk', monospace; font-size: 17px; font-weight: 700; color: var(--text-primary); }
+        .sun-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .golden-pill { padding: 5px 12px; border-radius: 100px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .golden-pill.active { background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%); color: var(--accent-amber); animation: goldenGlow 2s ease-in-out infinite; }
+        .golden-pill.soon { background: rgba(251, 191, 36, 0.1); color: var(--accent-amber); }
+        .golden-pill.inactive { background: var(--bg-elevated); color: var(--text-muted); }
+        @keyframes goldenGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.3); } 50% { box-shadow: 0 0 20px 4px rgba(251, 191, 36, 0.15); } }
+        .sun-arc-wrap { position: relative; height: 90px; margin-bottom: 16px; }
+        .sun-arc { position: absolute; bottom: 0; left: 8%; width: 84%; height: 75px; border: 2px dashed rgba(255,255,255,0.08); border-bottom: none; border-radius: 200px 200px 0 0; }
+        .sun-marker { position: absolute; width: 32px; height: 32px; background: var(--accent-amber); border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 0 24px var(--accent-amber); transition: all 0.5s ease; }
+        .sun-horizon { position: absolute; bottom: 0; left: 4%; width: 92%; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); }
+        .sun-times-row { display: flex; justify-content: space-between; padding: 0 4%; font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+        .sun-stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .sun-stat { text-align: center; padding: 14px; background: var(--bg-elevated); border-radius: var(--radius-sm); }
+        .sun-stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
+        .sun-stat-value { font-family: 'Space Grotesk', monospace; font-size: 18px; font-weight: 700; }
         .sun-stat-value.gold { color: var(--accent-amber); }
 
         /* Bottom Bar */
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px 24px; padding-bottom: max(16px, env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg-base) 60%, transparent); display: flex; justify-content: center; align-items: center; gap: 24px; z-index: 1000; }
-        .countdown-text { font-family: 'Space Grotesk', monospace; font-size: 13px; font-weight: 600; color: var(--text-muted); min-width: 44px; text-align: center; }
-        .refresh-btn { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 6px 24px -6px rgba(59, 130, 246, 0.5); transition: transform 0.2s, box-shadow 0.2s; }
-        .refresh-btn:active { transform: scale(0.94); }
-        .refresh-btn.spinning svg { animation: spin 0.6s linear infinite; }
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 24px; padding-bottom: max(12px, env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg-base) 70%, transparent); display: flex; justify-content: center; align-items: center; gap: 20px; z-index: 1000; }
+        .countdown-text { font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 600; color: var(--text-muted); min-width: 40px; text-align: center; }
+        .refresh-btn { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 32px -8px rgba(96, 165, 250, 0.5); transition: transform 0.2s, box-shadow 0.2s; }
+        .refresh-btn:active { transform: scale(0.92); }
+        .refresh-btn.spinning svg { animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Loading State */
-        .loading-state { text-align: center; padding: 64px 20px; }
-        .loading-spinner { width: 40px; height: 40px; border: 2.5px solid var(--bg-elevated); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-        .loading-text { font-size: 13px; font-weight: 500; color: var(--text-secondary); letter-spacing: -0.1px; }
-        .error-state { padding: 20px; background: rgba(244, 63, 94, 0.05); border: 1px solid rgba(244, 63, 94, 0.12); border-radius: var(--radius-md); text-align: center; font-size: 13px; color: var(--text-secondary); }
+        /* Loading/Error */
+        .loading-state { text-align: center; padding: 60px 20px; }
+        .loading-spinner { width: 48px; height: 48px; border: 3px solid var(--bg-elevated); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+        .loading-text { font-size: 14px; color: var(--text-secondary); }
+        .error-state { padding: 24px; background: rgba(251, 113, 133, 0.08); border: 1px solid rgba(251, 113, 133, 0.15); border-radius: var(--radius-md); text-align: center; font-size: 14px; color: var(--text-secondary); }
     </style>
 </head>
 <body>
@@ -267,7 +263,7 @@
     <div class="bottom-bar">
         <span class="countdown-text" id="countdown">60s</span>
         <button class="refresh-btn" onclick="refresh()" id="refreshBtn">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
                 <path d="M21 3v5h-5"/>
             </svg>
@@ -327,3 +323,442 @@
             else if (effective <= 100) { score -= 58; tags.push('☠️ Dangerous heat'); }
             else if (effective <= 110) { score -= 75; tags.push('☠️ Deadly heat'); }
             else { score -= 90; tags.push('☠️ Unsurvivable'); }
+
+            if (dewpt != null && effective > 55) {
+                if (dewpt >= 75) { score -= 28; tags.push('💦 Oppressive'); }
+                else if (dewpt >= 70) { score -= 20; tags.push('💦 Very humid'); }
+                else if (dewpt >= 65) { score -= 14; tags.push('💧 Humid'); }
+                else if (dewpt >= 60) { score -= 8; tags.push('Sticky'); }
+                else if (dewpt >= 55) { score -= 3; }
+                if (dewpt <= 20 && effective < 45) { score -= 5; tags.push('Very dry air'); }
+            }
+
+            if (windSpeed > 40 || windGust > 50) { score -= 30; tags.push('💨 Dangerous winds'); }
+            else if (windSpeed > 30 || windGust > 40) { score -= 22; tags.push('💨 Very windy'); }
+            else if (windSpeed > 20 || windGust > 30) { score -= 15; if (effective < 50) tags.push('💨 Cold & windy'); else tags.push('💨 Windy'); }
+            else if (windSpeed > 15) {
+                if (effective < 45) { score -= 12; tags.push('Biting wind'); }
+                else if (effective > 82) { score += 3; tags.push('🍃 Cooling breeze'); }
+                else { score -= 5; tags.push('Breezy'); }
+            }
+            else if (windSpeed >= 5 && windSpeed <= 15 && effective >= 72 && effective <= 90) {
+                score += 5; tags.push('🍃 Nice breeze');
+            }
+
+            if (uv >= 11) { score -= 18; tags.push('☀️ Extreme UV'); }
+            else if (uv >= 8) { score -= 12; tags.push('☀️ Very high UV'); }
+            else if (uv >= 6) { score -= 6; tags.push('High UV'); }
+            else if (uv >= 3) { score -= 2; }
+
+            if (precipRate > 0.5) { score -= 35; tags.push('⛈️ Heavy rain'); }
+            else if (precipRate > 0.2) { score -= 25; tags.push('🌧️ Rain'); }
+            else if (precipRate > 0.05) { score -= 15; tags.push('🌦️ Light rain'); }
+            else if (precipRate > 0) { score -= 10; tags.push('💧 Drizzle'); }
+
+            score = Math.max(0, Math.min(100, Math.round(score)));
+
+            let label, desc, color;
+            if (score >= 90) { label = 'Perfect'; desc = 'Ideal conditions — get outside and enjoy!'; color = '#10b981'; }
+            else if (score >= 80) { label = 'Excellent'; desc = 'Great day to be outside'; color = '#34d399'; }
+            else if (score >= 70) { label = 'Good'; desc = 'Pleasant conditions overall'; color = '#84cc16'; }
+            else if (score >= 64) { label = 'Fair'; desc = 'Decent but plan accordingly'; color = '#eab308'; }
+            else if (score >= 50) { label = 'Moderate'; desc = 'Dress appropriately for active parameters'; color = '#f59e0b'; }
+            else if (score >= 36) { label = 'Poor'; desc = 'Less than comfortable ambient elements'; color = '#f97316'; }
+            else if (score >= 22) { label = 'Bad'; desc = 'Uncomfortable ambient environment'; color = '#ef4444'; }
+            else if (score >= 10) { label = 'Harsh'; desc = 'Limit prolonged time outdoors'; color = '#dc2626'; }
+            else { label = 'Dangerous'; desc = 'Hazardous environmental conditions active'; color = '#991b1b'; }
+
+            return { score, label, desc, color, tags: tags.slice(0, 3), effective };
+        }
+
+        function getWeatherCondition(data) {
+            if (!data) return { icon: '❓', text: 'Unknown' };
+            const temp = data.imperial?.temp;
+            const humidity = data.humidity ?? 0;
+            const wind = data.imperial?.windSpeed ?? 0;
+            const precip = data.imperial?.precipRate ?? 0;
+            const solar = data.solarRadiation ?? 0;
+            const uv = data.uv ?? 0;
+            const hour = new Date().getHours();
+            const isNight = hour < 6 || hour >= 21;
+
+            if (temp != null && temp <= 35 && precip > 0) return { icon: '❄️', text: 'Snow' };
+            if (precip > 0.3) return { icon: '⛈️', text: 'Heavy Rain' };
+            if (precip > 0.1) return { icon: '🌧️', text: 'Rain' };
+            if (precip > 0) return { icon: '🌦️', text: 'Light Rain' };
+            if (humidity > 92 && temp != null && temp < 55) return { icon: '🌫️', text: 'Fog' };
+            if (temp != null && temp <= 20) return { icon: '🥶', text: 'Frigid' };
+            if (temp != null && temp <= 32) return { icon: '❄️', text: 'Freezing' };
+            if (temp != null && temp >= 100) return { icon: '🔥', text: 'Extreme Heat' };
+            if (temp != null && temp >= 90) return { icon: '☀️', text: 'Hot' };
+            if (wind > 25) return { icon: '💨', text: 'Windy' };
+            if (isNight) { return humidity < 70 ? { icon: '🌙', text: 'Clear Night' } : { icon: '☁️', text: 'Cloudy Night' }; }
+            if (solar > 600 || uv > 5) return { icon: '☀️', text: 'Sunny' };
+            if (solar > 300 || uv > 2) return { icon: '🌤️', text: 'Mostly Sunny' };
+            if (solar > 100) return { icon: '⛅', text: 'Partly Cloudy' };
+            return { icon: '☁️', text: 'Cloudy' };
+        }
+
+        function getWindDir(degrees) {
+            const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+            return dirs[Math.round(degrees / 22.5) % 16];
+        }
+        function getFullWindDir(abbr) {
+            const map = {'N':'North','NNE':'North-Northeast','NE':'Northeast','ENE':'East-Northeast','E':'East','ESE':'East-Southeast','SE':'Southeast','SSE':'South-Southeast','S':'South','SSW':'South-Southwest','SW':'Southwest','WSW':'West-Southwest','W':'West','WNW':'West-Northwest','NW':'Northwest','NNW':'North-Northwest'};
+            return map[abbr] || abbr;
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clockDay').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+            document.getElementById('clockTime').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            document.getElementById('clockDate').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            if (sunData) updateSunTracker();
+        }
+
+        function updateSunTracker() {
+            if (!sunData?.sunrise || !sunData?.sunset) return;
+            const now = new Date();
+            const sunrise = new Date(sunData.sunrise);
+            const sunset = new Date(sunData.sunset);
+            const goldenStart = new Date(sunset.getTime() - 60 * 60 * 1000);
+
+            document.getElementById('sunriseTime').textContent = sunrise.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            document.getElementById('sunsetTime').textContent = sunset.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            document.getElementById('goldenTime').textContent = goldenStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+            const total = sunset - sunrise;
+            const elapsed = now - sunrise;
+            let progress = Math.max(0, Math.min(1, elapsed / total));
+
+            const angle = Math.PI * progress;
+            const x = 50 - Math.cos(angle) * 42;
+            const y = 75 - Math.sin(angle) * 70;
+            const sunMarker = document.getElementById('sunMarker');
+            sunMarker.style.left = `${x}%`;
+            sunMarker.style.bottom = `${y}px`;
+
+            const remaining = sunset - now;
+            const daylightEl = document.getElementById('daylightLeft');
+            const pill = document.getElementById('goldenPill');
+
+            if (now < sunrise) { daylightEl.textContent = 'Pre-dawn'; sunMarker.textContent = '🌙'; pill.className = 'golden-pill inactive'; pill.textContent = 'Golden Hour'; }
+            else if (now > sunset) { daylightEl.textContent = 'Night'; sunMarker.textContent = '🌙'; pill.className = 'golden-pill inactive'; pill.textContent = 'Golden Hour'; }
+            else {
+                const h = Math.floor(remaining / 3600000);
+                const m = Math.floor((remaining % 3600000) / 60000);
+                daylightEl.textContent = `${h}h ${m}m`;
+                sunMarker.textContent = '☀️';
+
+                if (now >= goldenStart) {
+                    const left = Math.floor((sunset - now) / 60000);
+                    pill.className = 'golden-pill active';
+                    pill.textContent = `🎬 ${left}m left!`;
+                } else {
+                    const until = Math.floor((goldenStart - now) / 60000);
+                    if (until <= 120) {
+                        const uh = Math.floor(until / 60);
+                        const um = until % 60;
+                        pill.className = 'golden-pill soon';
+                        pill.textContent = uh > 0 ? `In ${uh}h ${um}m` : `In ${um}m`;
+                    } else { pill.className = 'golden-pill inactive'; pill.textContent = 'Golden Hour'; }
+                }
+            }
+        }
+
+        async function fetchCubsData() {
+            try {
+                const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/chc');
+                if (!res.ok) throw new Error('Cubs endpoint gateway error');
+                const json = await res.json();
+                const team = json.team;
+                if (!team) return;
+
+                if (team.nextEvent && team.nextEvent.length > 0) {
+                    const next = team.nextEvent[0];
+                    const gameDate = new Date(next.date);
+                    
+                    const numericDate = gameDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
+                    const writtenDay = gameDate.toLocaleDateString('en-US', { weekday: 'long' });
+                    const numericYear = gameDate.getFullYear();
+                    
+                    const timeStr = gameDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                    const shortName = next.shortName ? ` (${next.shortName})` : '';
+
+                    document.getElementById('cubsNextGame').innerHTML = `<strong>${numericDate}</strong>, ${writtenDay} <strong>${numericYear}</strong> @ ${timeStr}${shortName}`;
+                } else {
+                    document.getElementById('cubsNextGame').textContent = 'No upcoming games scheduled';
+                }
+
+                const last = team.lastEvent ? (Array.isArray(team.lastEvent) ? team.lastEvent[0] : team.lastEvent) : null;
+                if (last && last.competitions && last.competitions[0]) {
+                    const comp = last.competitions[0];
+                    const competitors = comp.competitors || [];
+                    
+                    let cubsScore = null;
+                    let oppScore = null;
+                    let oppName = '';
+
+                    competitors.forEach(teamObj => {
+                        const isCubs = teamObj.team?.abbreviation === 'CHC' || teamObj.team?.id === '16';
+                        const scoreStr = teamObj.score?.displayValue || teamObj.score || '0';
+                        if (isCubs) {
+                            cubsScore = parseInt(scoreStr);
+                        } else {
+                            oppScore = parseInt(scoreStr);
+                            oppName = teamObj.team?.abbreviation || teamObj.team?.shortDisplayName || 'OPP';
+                        }
+                    });
+
+                    if (cubsScore !== null && oppScore !== null) {
+                        const winLossMark = cubsScore > oppScore ? '🟢 W' : (cubsScore < oppScore ? '🔴 L' : '⚪ T');
+                        document.getElementById('cubsPrevGame').textContent = `CHC ${cubsScore} - ${oppScore} ${oppName} (${winLossMark})`;
+                    } else {
+                        document.getElementById('cubsPrevGame').textContent = 'Score calculations incomplete';
+                    }
+                } else {
+                    document.getElementById('cubsPrevGame').textContent = 'Historical scoreboard log empty';
+                }
+
+                document.getElementById('cubsCard').style.display = 'block';
+            } catch (err) {
+                console.warn('Cubs error:', err);
+            }
+        }
+
+        async function fetchStation(stationId) {
+            const url = `https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=e&apiKey=${API_KEY}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const json = await res.json();
+            return json.observations?.[0] || null;
+        }
+
+        async function fetchForecast(lat, lon) {
+            const url = `https://api.weather.com/v3/wx/forecast/daily/5day?geocode=${lat},${lon}&format=json&units=e&language=en-US&apiKey=${API_KEY}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        }
+
+        function renderStation(config, data, forecast) {
+            if (!data) {
+                return `<div class="station"><div class="station-header"><div><div class="station-name">${config.name}</div><div class="station-location">${config.location}</div></div><span class="station-status offline">● Offline</span></div><div class="error-state" style="margin: 20px;">Station data temporarily unavailable</div></div>`;
+            }
+
+            const getValidNum = (val) => (typeof val === 'number' && !isNaN(val)) ? val : null;
+
+            const temp = getValidNum(data.imperial?.temp);
+            const humidity = getValidNum(data.humidity);
+            const dewpt = getValidNum(data.imperial?.dewpt);
+            const windSpeed = getValidNum(data.imperial?.windSpeed) ?? 0;
+            const windDir = getValidNum(data.winddir) ?? 0;
+            const windGust = getValidNum(data.imperial?.windGust) ?? 0;
+            const pressure = getValidNum(data.imperial?.pressure);
+            const precipTotal = getValidNum(data.imperial?.precipTotal) ?? 0;
+            const uv = getValidNum(data.uv) ?? 0;
+            const solar = getValidNum(data.solarRadiation) ?? 0;
+
+            let lightningCount = 0;
+            if (data.lightning != null) {
+                if (typeof data.lightning === 'number') lightningCount = data.lightning;
+                else if (typeof data.lightning === 'object' && typeof data.lightning.count === 'number') lightningCount = data.lightning.count;
+            } else if (typeof data.lightningDay === 'number') lightningCount = data.lightningDay;
+            else if (typeof data.lightning_day === 'number') lightningCount = data.lightning_day;
+            else if (typeof data.lightningStrikeCount === 'number') lightningCount = data.lightningStrikeCount;
+            else if (data.imperial && typeof data.imperial.lightningCount === 'number') lightningCount = data.imperial.lightningCount;
+
+            let feelsLike = temp;
+            const windChill = getValidNum(data.imperial?.windChill);
+            const heatIndex = getValidNum(data.imperial?.heatIndex);
+            if (temp !== null) {
+                if (temp <= 50 && windSpeed > 3 && windChill !== null) feelsLike = windChill;
+                else if (temp >= 80 && heatIndex !== null) feelsLike = heatIndex;
+            }
+
+            const tempDisplay = (temp !== null) ? `${Math.round(temp)}` : '--';
+            const feelsLikeDisplay = (feelsLike !== null) ? `${Math.round(feelsLike)}` : '--';
+            const humidityDisplay = (humidity !== null) ? `${humidity}` : '--';
+            const dewptDisplay = (dewpt !== null) ? `${Math.round(dewpt)}` : '--';
+            const pressureDisplay = (pressure !== null) ? pressure.toFixed(2) : '--';
+            const precipDisplay = precipTotal.toFixed(2);
+
+            const windDirAbbr = getWindDir(windDir);
+            const windDirFull = getFullWindDir(windDirAbbr);
+            const condition = getWeatherCondition(data);
+            const comfort = calculateComfortIndex(data);
+
+            const circumference = 2 * Math.PI * 72;
+            const offset = circumference - ((comfort.score || 0) / 100) * circumference;
+
+            let forecastHtml = '';
+            if (forecast?.daypart?.[0]) {
+                const dp = forecast.daypart[0];
+                let startIdx = dp.temperature?.[0] === null ? 1 : 0;
+                for (let i = startIdx; i < Math.min(startIdx + 3, dp.daypartName?.length ?? 0); i++) {
+                    if (dp.temperature?.[i] === null) continue;
+                    forecastHtml += `<div class="forecast-item"><div class="forecast-period">${dp.daypartName[i]}</div><div class="forecast-narrative">${dp.narrative?.[i] || 'Forecast narrative unavailable'}</div></div>`;
+                }
+            }
+            if (!forecastHtml) forecastHtml = '<div class="forecast-item"><div class="forecast-narrative">Extended outlook unavailable</div></div>';
+
+            const uid = config.id;
+
+            let dataCells = `
+                <div class="data-cell"><div class="data-icon">💧</div><div class="data-label">Humidity</div><div class="data-value">${humidityDisplay}<span class="unit">%</span></div></div>
+                <div class="data-cell"><div class="data-icon">🌡️</div><div class="data-label">Dew Point</div><div class="data-value">${dewptDisplay}<span class="unit">°</span></div></div>
+                <div class="data-cell"><div class="data-icon">📊</div><div class="data-label">Pressure</div><div class="data-value">${pressureDisplay}<span class="unit">"</span></div></div>
+                <div class="data-cell"><div class="data-icon">🌧️</div><div class="data-label">Rain Today</div><div class="data-value">${precipDisplay}<span class="unit">"</span></div></div>`;
+
+            if (config.hasSolar) {
+                dataCells += `<div class="data-cell"><div class="data-icon">☀️</div><div class="data-label">UV Index</div><div class="data-value">${uv}</div></div>`;
+                dataCells += `<div class="data-cell"><div class="data-icon">⚡</div><div class="data-label">Solar</div><div class="data-value">${solar}<span class="unit">w</span></div></div>`;
+            }
+
+            let lightningHtml = '';
+            if (config.hasLightning) {
+                lightningHtml = `
+                    <div class="lightning-section">
+                        <div class="lightning-icon-wrap">⚡</div>
+                        <div class="lightning-info">
+                            <h4>Lightning Tracker</h4>
+                            <div class="lightning-count">${lightningCount}<span class="period">strikes today</span></div>
+                        </div>
+                    </div>`;
+            }
+
+            return `
+                <div class="station">
+                    <div class="station-header"><div><div class="station-name">${config.name}</div><div class="station-location">${config.location}</div></div><span class="station-status">● Live</span></div>
+                    
+                    <div class="comfort-section">
+                        <div class="comfort-ring-wrap">
+                            <svg class="comfort-ring-svg" viewBox="0 0 160 160">
+                                <circle class="comfort-ring-bg" cx="80" cy="80" r="72"/>
+                                <circle class="comfort-ring-fill" cx="80" cy="80" r="72" stroke="${comfort.color}" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"/>
+                            </svg>
+                            <div class="comfort-center">
+                                <div class="comfort-value" style="color: ${comfort.color}">${comfort.score}</div>
+                                <div class="comfort-label" style="color: ${comfort.color}">${comfort.label}</div>
+                            </div>
+                        </div>
+                        <div class="comfort-desc">${comfort.desc}</div>
+                        ${comfort.tags.length > 0 ? `<div class="comfort-tags">${comfort.tags.map(t => `<span class="comfort-tag">${t}</span>`).join('')}</div>` : ''}
+                    </div>
+
+                    <div class="temp-section">
+                        <div class="temp-main">
+                            <div class="temp-value">${tempDisplay}<span class="deg">°F</span></div>
+                            ${temp !== null && Math.round(feelsLike) !== Math.round(temp) ? `<div class="temp-feels">Feels like <strong>${feelsLikeDisplay}°</strong></div>` : ''}
+                        </div>
+                        <div class="condition-chip"><div class="condition-icon">${condition.icon}</div><div class="condition-text">${condition.text}</div></div>
+                    </div>
+
+                    <div class="wind-section">
+                        <div class="compass-container">
+                            <div class="compass-ring"></div>
+                            <div class="compass-dirs"><span class="n">N</span><span class="e">E</span><span class="s">S</span><span class="w">W</span></div>
+                            <div class="compass-needle" style="transform: translate(-50%, -100%) rotate(${windDir}deg);"></div>
+                            <div class="compass-center-dot"></div>
+                        </div>
+                        <div class="wind-info">
+                            <div class="wind-speed">${Math.round(windSpeed)}<span class="unit">mph</span></div>
+                            <div class="wind-direction-text">From the ${windDirFull} (${windDir}°)</div>
+                            ${windGust > windSpeed ? `<div class="wind-gust-alert">⚠️ Gusts to ${Math.round(windGust)} mph</div>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="data-grid">${dataCells}</div>
+                    ${lightningHtml}
+                    
+                    <button class="forecast-toggle" onclick="toggleForecast('${uid}')" id="btn-${uid}">
+                        📋 Extended Outlook
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="forecast-content" id="forecast-${uid}">${forecastHtml}</div>
+                </div>`;
+        }
+
+        function toggleForecast(id) {
+            document.getElementById(`forecast-${id}`).classList.toggle('open');
+            document.getElementById(`btn-${id}`).classList.toggle('open');
+        }
+
+        // FULL PARALLEL TELEMETRY ENGINE Optimization
+        async function refresh() {
+            const btn = document.getElementById('refreshBtn');
+            const content = document.getElementById('content');
+            btn.classList.add('spinning');
+
+            // Fire off sports data out-of-band (non-blocking)
+            fetchCubsData();
+
+            // Run station fetches in true parallel using mapped async contexts
+            const stationPromises = STATIONS.map(async (station) => {
+                let data = null;
+                let forecast = null;
+
+                try {
+                    data = await fetchStation(station.id);
+                } catch (err) {
+                    console.error(`Network gateway failed for ${station.id}:`, err);
+                }
+
+                if (data && data.lat && data.lon) {
+                    try {
+                        forecast = await fetchForecast(data.lat, data.lon);
+                        if (!sunData && forecast) {
+                            sunData = { sunrise: forecast.sunriseTimeLocal?.[0], sunset: forecast.sunsetTimeLocal?.[0] };
+                            setTimeout(() => {
+                                document.getElementById('sunCard').style.display = 'block';
+                                updateSunTracker();
+                            }, 0);
+                        }
+                    } catch (e) { console.warn('Forecast unavailable:', e); }
+                }
+
+                try {
+                    return renderStation(station, data, forecast);
+                } catch (renderError) {
+                    console.error(`Layout generation runtime exception on ${station.id}:`, renderError);
+                    return `<div class="station">
+                        <div class="station-header">
+                            <div>
+                                <div class="station-name">${station.name}</div>
+                                <div class="station-location">${station.location}</div>
+                            </div>
+                            <span class="station-status offline">● Error</span>
+                        </div>
+                        <div class="error-state" style="margin: 20px;">Telemetry parsing anomaly. Re-establishing telemetry pipeline...</div>
+                    </div>`;
+                }
+            });
+
+            // Await synchronization barrier across all threads simultaneously
+            const htmlCards = await Promise.all(stationPromises);
+            
+            // Push layout nodes straight to screen at the same instant
+            content.innerHTML = htmlCards.join('');
+            
+            countdown = 60;
+            btn.classList.remove('spinning');
+        }
+
+        function tick() {
+            countdown--;
+            if (countdown <= 0) { refresh(); countdown = 60; }
+            document.getElementById('countdown').textContent = `${countdown}s`;
+            updateClock();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            updateClock(); 
+            refresh(); 
+            setInterval(tick, 1000); 
+        });
+        
+        if ('wakeLock' in navigator) navigator.wakeLock.request('screen').catch(() => {});
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+    </script>
+</body>
+</html>
