@@ -172,6 +172,7 @@
         .sun-card.hidden { display: none; }
         .sun-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 12px; }
         .sun-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .session-label { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: lowercase; letter-spacing: 0.3px; margin-left: 4px; }
         .golden-pill { padding: 5px 12px; border-radius: 100px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid transparent; flex-shrink: 0; }
         .golden-pill.active { background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%); color: var(--accent-amber); }
         .golden-pill.soon { background: rgba(96, 165, 250, 0.1); border-color: rgba(96, 165, 250, 0.15); color: var(--accent-blue); }
@@ -267,7 +268,7 @@
 
         <section class="sun-card hidden" id="sunCard" aria-label="Sun position and golden hour tracker">
             <div class="sun-header">
-                <span class="sun-title"><span aria-hidden="true">✨</span> Celestial Horizon Tracker</span>
+                <span class="sun-title"><span aria-hidden="true">✨</span> Celestial Horizon Tracker <span class="session-label" id="sessionLabel"></span></span>
                 <span class="golden-pill inactive" id="goldenPill">Daylight</span>
             </div>
             <div class="sun-arc-wrap">
@@ -325,6 +326,7 @@
         AMBIENT_PROXY_URL: '/api/ambient',
         SUN_API_URL: 'https://api.open-meteo.com/v1/forecast?latitude=35.9251&longitude=-86.8689&daily=sunrise,sunset&timezone=America%2FChicago',
         ESPN_CUBS_URL: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/chc',
+        ESPN_CUBS_SCHEDULE_URL: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/chc/schedule',
 
         // Stations - order matters: used as positional fallback when name-match fails
         STATIONS: [
@@ -451,6 +453,50 @@
     // ====================================================================
     // SUN TRACKER
     // ====================================================================
+    // Phases happen TWICE per day: a morning session (around sunrise) and
+    // an evening session (around sunset). We pick whichever is "current
+    // or next" based on the time of day, so the display tracks what the
+    // viewer is about to experience or is in the middle of.
+    function computePhaseSession(sunrise, sunset, now) {
+        const goldenMin  = CONFIG.SUN.GOLDEN_BEFORE_SUNSET_MIN;
+        const blueMin    = CONFIG.SUN.BLUE_AFTER_SUNSET_MIN;
+        const sailingMin = CONFIG.SUN.SAILING_AFTER_SUNSET_MIN;
+
+        // Use morning session up until morning golden hour ends.
+        // After that, switch to evening session (which includes daytime
+        // when evening phases are still upcoming).
+        const morningGoldenEnd = new Date(sunrise.getTime() + goldenMin * 60_000);
+        const isMorning = now < morningGoldenEnd;
+
+        if (isMorning) {
+            // Morning sequence, chronologically:
+            //   sailing (deep predawn) → blue (predawn) → golden (post-sunrise)
+            return {
+                session: 'morning',
+                anchor:        sunrise,
+                sailingStart:  new Date(sunrise.getTime() - sailingMin * 60_000),
+                sailingEnd:    new Date(sunrise.getTime() - blueMin    * 60_000),
+                blueStart:     new Date(sunrise.getTime() - blueMin    * 60_000),
+                blueEnd:       sunrise,
+                goldenStart:   sunrise,
+                goldenEnd:     new Date(sunrise.getTime() + goldenMin  * 60_000)
+            };
+        } else {
+            // Evening sequence, chronologically:
+            //   golden (pre-sunset) → blue (post-sunset) → sailing (deep dusk)
+            return {
+                session: 'evening',
+                anchor:        sunset,
+                goldenStart:   new Date(sunset.getTime() - goldenMin  * 60_000),
+                goldenEnd:     sunset,
+                blueStart:     sunset,
+                blueEnd:       new Date(sunset.getTime() + blueMin    * 60_000),
+                sailingStart:  new Date(sunset.getTime() + blueMin    * 60_000),
+                sailingEnd:    new Date(sunset.getTime() + sailingMin * 60_000)
+            };
+        }
+    }
+
     function updateSunTracker() {
         if (!state.sunData?.sunrise || !state.sunData?.sunset) return;
 
@@ -458,36 +504,36 @@
         const sunrise = new Date(state.sunData.sunrise);
         const sunset  = new Date(state.sunData.sunset);
 
-        const goldenStart  = new Date(sunset.getTime() - CONFIG.SUN.GOLDEN_BEFORE_SUNSET_MIN * 60_000);
-        const blueStart    = new Date(sunset.getTime());
-        const blueEnd      = new Date(sunset.getTime() + CONFIG.SUN.BLUE_AFTER_SUNSET_MIN * 60_000);
-        const sailingStart = blueEnd;
-        const sailingEnd   = new Date(sunset.getTime() + CONFIG.SUN.SAILING_AFTER_SUNSET_MIN * 60_000);
+        const phases = computePhaseSession(sunrise, sunset, now);
 
-        // Sunrise / sunset row
+        // Sunrise / sunset row (12-hour format, consistent throughout)
         document.getElementById('sunriseTime').textContent = fmtClockTime(sunrise);
         document.getElementById('sunsetTime').textContent  = fmtClockTime(sunset);
 
-        // Phase windows show full RANGES, consistent 12-hour format
-        document.getElementById('winGolden').textContent  = fmtPhaseRange(goldenStart, blueStart);
-        document.getElementById('winBlue').textContent    = fmtPhaseRange(blueStart, blueEnd);
-        document.getElementById('winSailing').textContent = fmtPhaseRange(sailingStart, sailingEnd);
+        // Phase windows show full RANGES
+        document.getElementById('winGolden').textContent  = fmtPhaseRange(phases.goldenStart, phases.goldenEnd);
+        document.getElementById('winBlue').textContent    = fmtPhaseRange(phases.blueStart,   phases.blueEnd);
+        document.getElementById('winSailing').textContent = fmtPhaseRange(phases.sailingStart, phases.sailingEnd);
+
+        // Surface session in the title so morning vs evening is obvious at a glance
+        const sessionLabel = document.getElementById('sessionLabel');
+        if (sessionLabel) {
+            sessionLabel.textContent = phases.session === 'morning' ? '🌅 morning' : '🌇 evening';
+        }
 
         // Clear all active states
         document.getElementById('phaseGolden').classList.remove('active');
         document.getElementById('phaseBlue').classList.remove('active');
         document.getElementById('phaseSailing').classList.remove('active');
 
-        // Compute sun position along the arc.
-        // FIXED: sin(angle) maps directly to "height above horizon" (0 to 70).
-        // bottom = sin*70 means noon (sin=1) -> bottom: 70 -> top of arc.
+        // Sun position along the arc (unchanged - this is correct for full day)
         const total = sunset - sunrise;
         const elapsed = now - sunrise;
         const progress = Math.max(0, Math.min(1, elapsed / total));
 
         const angle = Math.PI * progress;
-        const x = 50 - Math.cos(angle) * 42;   // horizontal: left at sunrise, right at sunset
-        const y = Math.sin(angle) * 70;        // vertical: at horizon at sunrise/set, peak at noon
+        const x = 50 - Math.cos(angle) * 42;
+        const y = Math.sin(angle) * 70;
 
         const sunMarker = document.getElementById('sunMarker');
         sunMarker.style.left = `${x}%`;
@@ -495,59 +541,86 @@
 
         const pill = document.getElementById('goldenPill');
 
-        if (now >= goldenStart && now < blueStart) {
+        // Determine current active phase. Order of checks doesn't matter
+        // because phase windows don't overlap, but check golden FIRST so
+        // its "active" pill class wins if there's any boundary fuzziness.
+        if (now >= phases.goldenStart && now < phases.goldenEnd) {
             pill.className = 'golden-pill active';
             pill.textContent = '🎬 Golden Hour';
             document.getElementById('phaseGolden').classList.add('active');
             sunMarker.textContent = '☀️';
-        } else if (now >= blueStart && now < blueEnd) {
+        } else if (now >= phases.blueStart && now < phases.blueEnd) {
             pill.className = 'golden-pill soon';
             pill.textContent = '🌌 Blue Moment';
             document.getElementById('phaseBlue').classList.add('active');
             sunMarker.textContent = '🌙';
-        } else if (now >= blueEnd && now < sailingEnd) {
+        } else if (now >= phases.sailingStart && now < phases.sailingEnd) {
             pill.className = 'golden-pill inactive';
             pill.textContent = '⛵ Sailing Time';
             document.getElementById('phaseSailing').classList.add('active');
             sunMarker.textContent = '🌙';
         } else {
             pill.className = 'golden-pill inactive';
-            const isNight = (now < sunrise || now > sailingEnd);
+            const isNight = (now < sunrise || now > sunset);
             pill.textContent = isNight ? 'Night' : 'Daylight';
             sunMarker.textContent = isNight ? '🌙' : '☀️';
         }
     }
 
     // ====================================================================
-    // CUBS - handles pre/in/post game states distinctly
+    // CUBS - uses the schedule endpoint, not /teams/chc, because ESPN's
+    // team endpoint is slow to update nextEvent after a game finishes -
+    // it can stick a completed game in "nextEvent" for hours. The schedule
+    // endpoint always returns events with real dates we can compare.
+    // Priority: live game > next future-dated > most recent past.
     // ====================================================================
     async function fetchCubsData() {
         try {
-            const res = await fetch(CONFIG.ESPN_CUBS_URL);
-            if (!res.ok) throw new Error(`ESPN ${res.status}`);
+            const res = await fetch(CONFIG.ESPN_CUBS_SCHEDULE_URL);
+            if (!res.ok) throw new Error(`ESPN schedule ${res.status}`);
             const json = await res.json();
-            const team = json.team;
-            if (!team) return;
+            const events = Array.isArray(json.events) ? json.events : [];
+            if (events.length === 0) return;
 
-            // Decide which event matters:
-            //   live > recent final > upcoming
-            const upcoming = Array.isArray(team.nextEvent) ? team.nextEvent[0] : null;
-            const past     = Array.isArray(team.lastEvent) ? team.lastEvent[0] : null;
-
+            const now = new Date();
             const stateOf = (e) => e?.status?.type?.state || null;
-            let event = null;
-            let gameState = null; // 'in' | 'post' | 'pre'
 
-            if (stateOf(upcoming) === 'in') { event = upcoming; gameState = 'in';   }
-            else if (stateOf(past) === 'post') { event = past;  gameState = 'post'; }
-            else if (upcoming) { event = upcoming; gameState = 'pre'; }
-            else if (past)     { event = past;     gameState = 'post'; }
-            else return; // no data, leave card hidden
+            let event = null;
+            let gameState = null;
+
+            // 1. Live game wins
+            const live = events.find(e => stateOf(e) === 'in');
+            if (live) {
+                event = live;
+                gameState = 'in';
+            } else {
+                // 2. Next genuinely future-dated game
+                const future = events
+                    .filter(e => e?.date && new Date(e.date) > now)
+                    .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+
+                if (future) {
+                    event = future;
+                    gameState = 'pre';
+                } else {
+                    // 3. Most recent past game
+                    const past = events
+                        .filter(e => e?.date && new Date(e.date) <= now)
+                        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+                    if (past) {
+                        event = past;
+                        gameState = 'post';
+                    }
+                }
+            }
+
+            if (!event) return;
 
             renderCubsCard(event, gameState);
             document.getElementById('cubsCard').classList.remove('hidden');
         } catch (e) {
-            console.warn('Cubs feed unavailable:', e.message);
+            console.warn('Cubs schedule unavailable:', e.message);
         }
     }
 
