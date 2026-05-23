@@ -218,15 +218,9 @@
         .game-block.empty { opacity: 0.55; }
         .game-block-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; }
         .game-block-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-        .game-block-row + .game-block-row { margin-top: 4px; }
         .game-matchup { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
         .game-meta { font-size: 12px; color: var(--text-secondary); font-weight: 500; text-align: right; flex-shrink: 0; }
         .game-meta .strong { color: var(--text-primary); font-weight: 700; }
-        .game-score { font-family: 'Space Grotesk', monospace; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-        .game-score .sep { color: var(--text-muted); margin: 0 6px; font-weight: 500; }
-        .game-result { padding: 3px 9px; border-radius: 100px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
-        .game-result.win { background: rgba(52, 211, 153, 0.12); color: var(--accent-emerald); border: 1px solid rgba(52, 211, 153, 0.25); }
-        .game-result.loss { background: rgba(251, 113, 133, 0.1); color: var(--accent-rose); border: 1px solid rgba(251, 113, 133, 0.22); }
         .game-live-detail { font-size: 12px; color: var(--accent-rose); font-weight: 600; }
 
         /* Sun tracker */
@@ -307,7 +301,7 @@
             </div>
         </main>
 
-        <section class="sports-card hidden" id="cubsCard" aria-label="Chicago Cubs upcoming and last game">
+        <section class="sports-card hidden" id="cubsCard" aria-label="Chicago Cubs next game">
             <div class="sports-header">
                 <span class="sports-title"><span aria-hidden="true">🐻</span> Chicago Cubs</span>
                 <span class="sports-pill" id="cubsHeaderPill" hidden></span>
@@ -318,18 +312,6 @@
                 <div class="game-block-row">
                     <span class="game-matchup" id="nextMatchup">—</span>
                     <span class="game-meta" id="nextMeta">—</span>
-                </div>
-            </div>
-
-            <div class="game-block" id="lastGameBlock">
-                <div class="game-block-label">Last Game</div>
-                <div class="game-block-row">
-                    <span class="game-matchup" id="lastMatchup">—</span>
-                    <span class="game-meta" id="lastMeta">—</span>
-                </div>
-                <div class="game-block-row">
-                    <span class="game-score" id="lastScore">—</span>
-                    <span class="game-result" id="lastResult" hidden></span>
                 </div>
             </div>
         </section>
@@ -641,9 +623,9 @@
     }
 
     // ====================================================================
-    // CUBS - shows two blocks: NEXT GAME (or live game if one is happening
-    // right now) + LAST GAME (most recent completed result). Pulls from
-    // the schedule endpoint which has reliable per-event dates.
+    // CUBS - shows the next scheduled game, or a live indicator if a game
+    // is in progress right now. Pulls from the schedule endpoint which has
+    // reliable per-event dates.
     // ====================================================================
     async function fetchCubsData() {
         try {
@@ -656,24 +638,15 @@
             const now = new Date();
             const stateOf = (e) => e?.status?.type?.state || null;
 
-            // LIVE game (if any) takes the "next" slot with a live indicator
+            // LIVE game takes priority; otherwise the earliest future-dated,
+            // not-yet-started game.
             const live = events.find(e => stateOf(e) === 'in');
-
-            // NEXT upcoming - earliest future-dated, not-yet-started game
             const nextGame = live || events
                 .filter(e => e?.date && new Date(e.date) > now && stateOf(e) !== 'post')
                 .sort((a, b) => new Date(a.date) - new Date(b.date))[0]
                 || null;
 
-            // LAST completed - most recent game whose status is 'post'
-            const lastGame = events
-                .filter(e => stateOf(e) === 'post')
-                .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
-                || null;
-
-            if (!nextGame && !lastGame) return;
-
-            renderCubsCard(nextGame, lastGame, !!live);
+            renderCubsCard(nextGame, !!live);
             document.getElementById('cubsCard').classList.remove('hidden');
         } catch (e) {
             console.warn('Cubs schedule unavailable:', e.message);
@@ -701,12 +674,13 @@
         return `${isHome ? 'vs' : '@'} ${oppName}`;
     }
 
-    function renderCubsCard(nextGame, lastGame, isLive) {
+    function renderCubsCard(nextGame, isLive) {
         const headerPill = document.getElementById('cubsHeaderPill');
-        const nextBlock = document.getElementById('nextGameBlock');
-        const lastBlock = document.getElementById('lastGameBlock');
+        const nextBlock  = document.getElementById('nextGameBlock');
+        const nextMatchup = document.getElementById('nextMatchup');
+        const nextMeta    = document.getElementById('nextMeta');
 
-        // ----- Header pill -----
+        // Header pill - only shown while a game is live
         headerPill.classList.remove('live');
         if (isLive && nextGame) {
             const detail = nextGame.status?.type?.shortDetail || nextGame.status?.type?.detail || 'Live';
@@ -717,75 +691,30 @@
             headerPill.hidden = true;
         }
 
-        // ----- NEXT GAME block -----
-        const nextMatchup = document.getElementById('nextMatchup');
-        const nextMeta    = document.getElementById('nextMeta');
-
-        if (nextGame) {
-            nextBlock.classList.remove('empty');
-            nextMatchup.textContent = buildMatchup(nextGame);
-
-            const d = new Date(nextGame.date);
-            const dayShort = d.toLocaleDateString('en-US', { weekday: 'short' });
-            const datePart = d.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
-
-            if (isLive) {
-                const detail = nextGame.status?.type?.shortDetail || 'In Progress';
-                // For live games, show live detail + score so far
-                const { chc, opp } = extractCompetitors(nextGame);
-                const chcScore = chc?.score?.displayValue ?? chc?.score ?? '-';
-                const oppScore = opp?.score?.displayValue ?? opp?.score ?? '-';
-                nextMeta.innerHTML = `<span class="game-live-detail">${detail}</span> &nbsp; <span class="strong">${chcScore}–${oppScore}</span>`;
-            } else {
-                const timePart = fmtClockTime(d);
-                nextMeta.innerHTML = `<span class="strong">${dayShort} ${datePart}</span> · ${timePart}`;
-            }
-        } else {
+        if (!nextGame) {
             nextBlock.classList.add('empty');
             nextMatchup.textContent = 'No upcoming games';
             nextMeta.textContent = '—';
+            return;
         }
 
-        // ----- LAST GAME block -----
-        const lastMatchup = document.getElementById('lastMatchup');
-        const lastMeta    = document.getElementById('lastMeta');
-        const lastScore   = document.getElementById('lastScore');
-        const lastResult  = document.getElementById('lastResult');
+        nextBlock.classList.remove('empty');
+        nextMatchup.textContent = buildMatchup(nextGame);
 
-        if (lastGame) {
-            lastBlock.classList.remove('empty');
-            lastMatchup.textContent = buildMatchup(lastGame);
+        const d = new Date(nextGame.date);
+        const dayShort = d.toLocaleDateString('en-US', { weekday: 'short' });
+        const datePart = d.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
 
-            const d = new Date(lastGame.date);
-            const dayShort = d.toLocaleDateString('en-US', { weekday: 'short' });
-            const datePart = d.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
-            lastMeta.innerHTML = `<span class="strong">${dayShort} ${datePart}</span>`;
-
-            const { chc, opp } = extractCompetitors(lastGame);
+        if (isLive) {
+            // Show live status + running score in the meta slot
+            const detail = nextGame.status?.type?.shortDetail || 'In Progress';
+            const { chc, opp } = extractCompetitors(nextGame);
             const chcScore = chc?.score?.displayValue ?? chc?.score ?? '-';
             const oppScore = opp?.score?.displayValue ?? opp?.score ?? '-';
-            const oppAbbr  = opp?.team?.abbreviation || 'OPP';
-            lastScore.innerHTML = `CHC <span class="sep">${chcScore}–${oppScore}</span> ${oppAbbr}`;
-
-            // Win/loss pill
-            lastResult.classList.remove('win', 'loss');
-            if (chc?.winner === true) {
-                lastResult.classList.add('win');
-                lastResult.textContent = 'W';
-                lastResult.hidden = false;
-            } else if (opp?.winner === true) {
-                lastResult.classList.add('loss');
-                lastResult.textContent = 'L';
-                lastResult.hidden = false;
-            } else {
-                lastResult.hidden = true;
-            }
+            nextMeta.innerHTML = `<span class="game-live-detail">${detail}</span> &nbsp; <span class="strong">${chcScore}–${oppScore}</span>`;
         } else {
-            lastBlock.classList.add('empty');
-            lastMatchup.textContent = 'No completed games';
-            lastMeta.textContent = '—';
-            lastScore.textContent = '—';
-            lastResult.hidden = true;
+            const timePart = fmtClockTime(d);
+            nextMeta.innerHTML = `<span class="strong">${dayShort} ${datePart}</span> · ${timePart}`;
         }
     }
 
