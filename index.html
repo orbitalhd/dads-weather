@@ -149,6 +149,61 @@
         .lightning-count { font-family: 'Space Grotesk', monospace; font-size: 28px; font-weight: 700; color: var(--accent-purple); }
         .lightning-count .period { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-left: 4px; }
 
+        /* Forecast dropdown */
+        .forecast-toggle {
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%; padding: 14px 20px;
+            background: var(--bg-elevated);
+            border: none; border-top: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            font-family: 'DM Sans', inherit; font-size: 13px; font-weight: 600;
+            cursor: pointer; text-align: left;
+            transition: background 0.2s;
+        }
+        .forecast-toggle:hover { background: rgba(255,255,255,0.03); }
+        .forecast-toggle:active { background: rgba(255,255,255,0.05); }
+        .forecast-toggle-label { display: flex; align-items: center; gap: 8px; }
+        .forecast-chevron {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted); flex-shrink: 0;
+        }
+        .forecast-toggle[aria-expanded="true"] .forecast-chevron { transform: rotate(180deg); }
+        .forecast-toggle[aria-expanded="true"] { background: rgba(96, 165, 250, 0.05); }
+        .forecast-content {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-base);
+            border-top: 1px solid transparent;
+        }
+        .forecast-content.expanded {
+            max-height: 200px;
+            border-top-color: var(--border-subtle);
+        }
+        .forecast-scroll {
+            display: flex; gap: 10px; padding: 16px 16px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+        .forecast-scroll::-webkit-scrollbar { height: 4px; }
+        .forecast-scroll::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 2px; }
+        .forecast-hour {
+            flex-shrink: 0; min-width: 68px; padding: 12px 8px 10px;
+            background: var(--bg-card); border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle); text-align: center;
+            scroll-snap-align: start;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .forecast-hour.is-now { border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.06); }
+        .forecast-time { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .forecast-hour.is-now .forecast-time { color: var(--accent-blue); }
+        .forecast-icon { font-size: 22px; line-height: 1; margin-bottom: 6px; }
+        .forecast-temp { font-family: 'Space Grotesk', monospace; font-size: 18px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+        .forecast-pop { font-size: 10px; color: var(--accent-blue); font-weight: 600; min-height: 12px; }
+        .forecast-pop.dim { color: var(--text-muted); opacity: 0.4; }
+        .forecast-empty { padding: 24px 20px; text-align: center; font-size: 13px; color: var(--text-muted); }
+
         /* Cubs scoreboard */
         .sports-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 20px; box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5); }
         .sports-card.hidden { display: none; }
@@ -216,6 +271,7 @@
             .comfort-ring-fill { transition: none; }
             .compass-needle { transition: none; }
             .status-dot, .sports-pill.live { animation: none; }
+            .forecast-chevron, .forecast-content { transition: none !important; }
         }
     </style>
 </head>
@@ -325,6 +381,10 @@
         // Endpoints
         AMBIENT_PROXY_URL: '/api/ambient',
         SUN_API_URL: 'https://api.open-meteo.com/v1/forecast?latitude=35.9251&longitude=-86.8689&daily=sunrise,sunset&timezone=America%2FChicago',
+        FORECAST_API_URL: 'https://api.open-meteo.com/v1/forecast?latitude=35.9251&longitude=-86.8689' +
+            '&hourly=temperature_2m,precipitation_probability,weather_code,is_day' +
+            '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch' +
+            '&timezone=America%2FChicago&forecast_days=2',
         ESPN_CUBS_URL: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/chc',
         ESPN_CUBS_SCHEDULE_URL: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/chc/schedule',
 
@@ -358,6 +418,7 @@
     // ====================================================================
     const state = {
         sunData: null,             // { sunrise: ISOstring, sunset: ISOstring }
+        forecastData: null,        // 10-hour rolled forecast (shared across stations)
         countdown: CONFIG.POLL_INTERVAL_SECONDS,
         refreshInFlight: false,
         stationElements: new Map() // id -> root DOM element for that station
@@ -708,6 +769,102 @@
     }
 
     // ====================================================================
+    // FORECAST - Open-Meteo hourly forecast. Stations are <1mi apart so
+    // we fetch ONE forecast and display in both station dropdowns.
+    // ====================================================================
+    async function fetchForecast() {
+        try {
+            const res = await fetch(CONFIG.FORECAST_API_URL);
+            if (!res.ok) return null;
+            const json = await res.json();
+            if (!json.hourly?.time || !Array.isArray(json.hourly.time)) return null;
+
+            // Find first hourly slot that is current-or-future
+            const now = new Date();
+            const startIdx = json.hourly.time.findIndex(t => new Date(t) >= new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours()));
+            if (startIdx === -1) return null;
+
+            const slice = (arr) => Array.isArray(arr) ? arr.slice(startIdx, startIdx + 10) : [];
+            return {
+                times: slice(json.hourly.time),
+                temps: slice(json.hourly.temperature_2m),
+                pops:  slice(json.hourly.precipitation_probability),
+                codes: slice(json.hourly.weather_code),
+                isDay: slice(json.hourly.is_day)
+            };
+        } catch (e) {
+            console.warn('Forecast fetch failed:', e.message);
+            return null;
+        }
+    }
+
+    // WMO weather code (per Open-Meteo docs) -> emoji icon.
+    // isDay = 1 during daylight hours, 0 at night.
+    function wmoToIcon(code, isDay) {
+        const day = isDay === 1;
+        if (code === 0)                return day ? '☀️' : '🌙';
+        if (code === 1)                return day ? '🌤️' : '🌙';
+        if (code === 2)                return day ? '⛅' : '☁️';
+        if (code === 3)                return '☁️';
+        if (code === 45 || code === 48) return '🌫️';
+        if (code >= 51 && code <= 55)  return '🌦️';
+        if (code === 56 || code === 57) return '🌨️';
+        if (code === 65 || code === 82) return '⛈️';
+        if (code >= 61 && code <= 67)  return '🌧️';
+        if (code >= 71 && code <= 77)  return '❄️';
+        if (code === 80 || code === 81) return '🌦️';
+        if (code === 85 || code === 86) return '❄️';
+        if (code >= 95)                return '⛈️';
+        return '☁️';
+    }
+
+    function updateForecast(rootEl, forecast) {
+        const container = rootEl.querySelector('[data-field="forecast"]');
+        if (!container) return;
+
+        if (!forecast || !forecast.times || forecast.times.length === 0) {
+            container.innerHTML = '<div class="forecast-empty">Forecast unavailable</div>';
+            return;
+        }
+
+        const nowHour = new Date().getHours();
+
+        const hoursHtml = forecast.times.map((time, i) => {
+            const d = new Date(time);
+            const isCurrentHour = d.getHours() === nowHour && i === 0;
+            const timeLabel = (i === 0 && isCurrentHour)
+                ? 'NOW'
+                : d.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }).replace(' ', '');
+            const icon = wmoToIcon(forecast.codes[i], forecast.isDay[i]);
+            const temp = (typeof forecast.temps[i] === 'number') ? Math.round(forecast.temps[i]) : '--';
+            const pop  = (typeof forecast.pops[i]  === 'number') ? forecast.pops[i] : 0;
+            const popHtml = pop >= 10
+                ? `<div class="forecast-pop">💧 ${pop}%</div>`
+                : `<div class="forecast-pop dim">—</div>`;
+            return `
+                <div class="forecast-hour${isCurrentHour ? ' is-now' : ''}">
+                    <div class="forecast-time">${timeLabel}</div>
+                    <div class="forecast-icon" aria-hidden="true">${icon}</div>
+                    <div class="forecast-temp">${temp}°</div>
+                    ${popHtml}
+                </div>`;
+        }).join('');
+
+        container.innerHTML = `<div class="forecast-scroll">${hoursHtml}</div>`;
+    }
+
+    function setupForecastToggle(rootEl) {
+        const btn = rootEl.querySelector('.forecast-toggle');
+        const content = rootEl.querySelector('.forecast-content');
+        if (!btn || !content) return;
+        btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            content.classList.toggle('expanded');
+        });
+    }
+
+    // ====================================================================
     // STATION DOM - skeleton built ONCE, then fields are updated in place.
     // No more innerHTML thrash on every poll.
     // ====================================================================
@@ -786,6 +943,15 @@
                 ${solarCells}
             </div>
             ${lightningSection}
+            <button class="forecast-toggle" type="button" aria-expanded="false" aria-controls="forecast-${config.id}">
+                <span class="forecast-toggle-label"><span aria-hidden="true">📅</span> 10-Hour Forecast</span>
+                <svg class="forecast-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+            <div class="forecast-content" id="forecast-${config.id}" data-field="forecast">
+                <div class="forecast-empty">Loading forecast...</div>
+            </div>
         `;
 
         return div;
@@ -921,6 +1087,7 @@
             const el = buildStationSkeleton(cfg);
             content.appendChild(el);
             state.stationElements.set(cfg.id, el);
+            setupForecastToggle(el);
         });
     }
 
@@ -957,11 +1124,12 @@
         try {
             ensureStationsRendered();
 
-            // All three fetches in parallel - Cubs no longer fire-and-forget
-            const [devices, astronomicalData, _cubs] = await Promise.all([
+            // All four fetches in parallel
+            const [devices, astronomicalData, forecast, _cubs] = await Promise.all([
                 fetchAmbientDevices(),
                 fetchCelestial(),
-                fetchCubsData() // awaited so spinner reflects true completion
+                fetchForecast(),
+                fetchCubsData()
             ]);
 
             if (astronomicalData) {
@@ -970,10 +1138,17 @@
                 updateSunTracker();
             }
 
+            if (forecast) {
+                state.forecastData = forecast;
+            }
+
             CONFIG.STATIONS.forEach((cfg, idx) => {
                 const device = matchDeviceToStation(devices, cfg, idx);
                 const rootEl = state.stationElements.get(cfg.id);
-                if (rootEl) updateStation(rootEl, cfg, device?.lastData || null);
+                if (rootEl) {
+                    updateStation(rootEl, cfg, device?.lastData || null);
+                    updateForecast(rootEl, state.forecastData);
+                }
             });
 
             // Screen reader cue
